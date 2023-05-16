@@ -1,0 +1,102 @@
+{
+  "POP" : {
+    "name" : "강수확률",
+    "unit" : "%",
+    "code_values" : []
+  },
+  "PCP" : {
+    "name" : "강수량",
+    "unit" : "mm",
+    "code_values" : []
+  },
+  "REH" : {
+    "name" : "습도",
+    "unit" : "%",
+    "code_values" : []
+  },
+  "SNO" : {
+    "name" : "신적설",
+    "unit" : "cm",
+    "code_values" : []
+  },
+  "TMP" : {
+    "name" : "기온(1시간)",
+    "unit" : "℃",
+    "code_values" : []
+  },
+  "TMN" : {
+    "name" : "최저기온",
+    "unit" : "℃",
+    "code_values" : []
+  },
+  "TMX" : {
+    "name" : "최고기온",
+    "unit" : "℃",
+    "code_values" : []
+  },
+  "T1H" : {
+    "name" : "기온",
+    "unit" : "℃",
+    "code_values" : []
+  },
+  "UUU" : {
+    "name" : "풍속(동서)",
+    "unit" : "m/s",
+    "code_values" : []
+  },
+  "VVV" : {
+    "name" : "풍속(남북)",
+    "unit" : "m/s",
+    "code_values" : []
+  },
+  "WSD" : {
+    "name" : "풍속",
+    "unit" : "m/s",
+    "code_values" : []
+  },
+  "VEC" : {
+    "name" : "풍향",
+    "unit" : "deg",
+    "code_values" : []
+  },
+  "WAV" : {
+    "name" : "파고",
+    "unit" : "M",
+    "code_values" : []
+  },
+  "LGT" : {
+    "name" : "낙뢰",
+    "unit" : "kA",
+    "code_values" : []
+  },
+  "RN1" : {
+    "name" : "강수량(1시간)",
+    "unit" : "mm",
+    "code_values" : []
+  },
+  "PTY" : {
+    "name" : "강수형태",
+    "unit" : "",
+    "code_values" : [
+      "없음",
+      "비",
+      "비/눈",
+      "눈",
+      "소나기",
+      "빗방울",
+      "빗방울눈날림",
+      "눈날림"
+    ]
+  },
+  "SKY" : {
+    "name" : "하늘상태",
+    "unit" : "",
+    "code_values" : [
+      "",
+      "맑음",
+      "",
+      "구름많음",
+      "흐림"
+    ]
+  }
+}
