@@ -1,16 +1,19 @@
 import 'package:hive/hive.dart';
+import 'package:sweater/repository/source/local/dnsty_entity.dart';
 import 'package:sweater/repository/source/local/fcst_entity.dart';
 import 'package:sweater/repository/source/local/ncst_entity.dart';
 
 class WeatherDao {
-  static const weatherUltraNcstList = 'weatherUltraNcstList';
-  static const weatherUltraFcstList = 'weatherUltraFcstList';
+  static const ultraNcstList = 'ultraNcstList';
+  static const ultraFcstList = 'ultraFcstList';
+  static const vilageFcstList = 'vilageFcstList';
+  static const mesureDnstyList = 'mesureDnstyList';
 
   // ultraNcst 추가
   Future<void> insertUltraNcstList(
-      List<NcstEntity> ultraNcstListEntities) async {
+      List<NcstEntity> ncstListEntities) async {
     final box = await Hive.openBox<NcstEntity>('ultraNcst');
-    await box.addAll(ultraNcstListEntities);
+    await box.addAll(ncstListEntities);
   }
 
   // ultraNcst 클리어
@@ -27,10 +30,10 @@ class WeatherDao {
 
   // ultraFcst 추가
   Future<void> insertUltraFcstList(
-      List<FcstEntity> ultraFcstListEntities
+      List<FcstEntity> fcstListEntities
       ) async {
     final box = await Hive.openBox<FcstEntity>('ultraFcst');
-    await box.addAll(ultraFcstListEntities);
+    await box.addAll(fcstListEntities);
   }
 
   // ultraFcst 클리어
@@ -47,10 +50,10 @@ class WeatherDao {
 
   // vilageFcst 추가
   Future<void> insertVilageFcstList(
-      List<FcstEntity> ultraFcstListEntities
+      List<FcstEntity> fcstListEntities
       ) async {
     final box = await Hive.openBox<FcstEntity>('vilageFcst');
-    await box.addAll(ultraFcstListEntities);
+    await box.addAll(fcstListEntities);
   }
 
   // vilageFcst 클리어
@@ -62,6 +65,26 @@ class WeatherDao {
   // vilageFcst getAll
   Future<List<FcstEntity>> getAllVillageFcstList() async {
     final box = await Hive.openBox<FcstEntity>('vilageFcst');
+    return box.values.toList();
+  }
+
+  // mesureDnsty 추가
+  Future<void> insertMesureDnstyList(
+      List<DnstyEntity> dnstyEntities
+      ) async {
+    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
+    await box.addAll(dnstyEntities);
+  }
+
+  // mesureDnsty 클리어
+  Future clearMesureDnstyList() async {
+    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
+    await box.clear();
+  }
+
+  // mesureDnsty getAll
+  Future<List<DnstyEntity>> getAllMesureDnstyList() async {
+    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
     return box.values.toList();
   }
 }

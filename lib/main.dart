@@ -16,10 +16,10 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(NcstEntityAdapter());
   Hive.registerAdapter(FcstEntityAdapter());
-  final repository = WeatherRepository(WeatherApi(), WeatherDao());
+  final repository = WeatherRepository(RemoteApi(), WeatherDao());
   runApp(const MyApp());
 
-  var list = await repository.getVilageFast(true);
+  var list = await repository.getMesureDnsty(false);
   list.when(success: (info) {
     for (var e in info) {
       print(e.toString());

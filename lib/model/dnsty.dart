@@ -81,4 +81,9 @@ class Dnsty {
     data['o3Value'] = o3Value;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'Dnsty: { pm10Value: $pm10Value, khaiValue: $khaiValue, dateTime: $dataTime }';
+  }
 }

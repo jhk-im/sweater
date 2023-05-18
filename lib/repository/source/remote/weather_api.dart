@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class WeatherApi {
+class RemoteApi {
   static const baseUrl = "apis.data.go.kr";
   static final serviceKey = dotenv.env['SERVICE_KEY'];
 
@@ -49,6 +49,19 @@ class WeatherApi {
       'base_time': time,
       'nx': '$x',
       'ny': '$y',
+    });
+    return await http.get(url);
+  }
+
+  // 측정소별 실시간 대기오염 측정정보 조회
+  Future<http.Response> getMsrstnAcctoRltmMesureDnsty(String sName) async {
+    var url = Uri.https(baseUrl, '/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty', {
+      'returnType': 'JSON',
+      'serviceKey': serviceKey ?? '',
+      'numOfRows': '100',
+      'pageNo': '1',
+      'dataTerm': 'DAILY',
+      'stationName': sName,
     });
     return await http.get(url);
   }

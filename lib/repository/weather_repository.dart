@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:sweater/model/dnsty.dart';
+import 'package:sweater/model/dnsty_list.dart';
 import 'package:sweater/model/fcst.dart';
 import 'package:sweater/model/fcst_list.dart';
 import 'package:sweater/model/ncst.dart';
@@ -12,7 +14,7 @@ import 'package:sweater/repository/source/remote/weather_api.dart';
 import 'package:sweater/utils/result.dart';
 
 class WeatherRepository {
-  final WeatherApi _api;
+  final RemoteApi _api;
   final WeatherDao _dao;
 
   WeatherRepository(this._api, this._dao);
@@ -111,6 +113,35 @@ class WeatherRepository {
       return Result.success(result);
     } catch (e) {
       return Result.error(Exception('getUltraStrFcst failed: ${e.toString()}'));
+    }
+  }
+
+  // 측정소별 미세먼지
+  Future<Result<List<Dnsty>>> getMesureDnsty(bool fetchFromRemote) async {
+    final localList = await _dao.getAllMesureDnstyList();
+
+    final isDbEmpty = localList.isEmpty;
+    final shouldJustLoadFromCache = !isDbEmpty && !fetchFromRemote;
+
+    // local
+    if (shouldJustLoadFromCache) {
+      return Result.success(localList.map((e) => e.toDnsty()).toList());
+    }
+
+    // remote
+    try {
+      final response = await _api.getMsrstnAcctoRltmMesureDnsty('강서구');
+      final jsonResult = jsonDecode(response.body);
+      DnstyList list = DnstyList.fromJson(jsonResult['response']['body']);
+      List<Dnsty> result = [];
+      if (list.items != null) {
+        for (var item in list.items!) {
+          result.add(item);
+        }
+      }
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(Exception('getMesureDnsty failed: ${e.toString()}'));
     }
   }
 }
