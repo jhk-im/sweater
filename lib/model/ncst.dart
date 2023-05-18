@@ -12,11 +12,11 @@ class Ncst {
 
   Ncst(
       {this.baseDate,
-        this.baseTime,
-        this.category,
-        this.nx,
-        this.ny,
-        this.obsrValue});
+      this.baseTime,
+      this.category,
+      this.nx,
+      this.ny,
+      this.obsrValue});
 
   Ncst.fromJson(Map<String, dynamic> json) {
     baseDate = json['baseDate'];
@@ -36,5 +36,10 @@ class Ncst {
     data['ny'] = ny;
     data['obsrValue'] = obsrValue;
     return data;
+  }
+
+  @override
+  String toString() {
+    return 'Ncst: {baseDate: $baseDate, baseTime: $baseTime, category: $category, nx: $nx, ny: $ny, obsrValue: $obsrValue, weatherCategory: $weatherCategory}';
   }
 }

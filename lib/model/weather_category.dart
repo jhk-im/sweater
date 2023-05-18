@@ -18,4 +18,9 @@ class WeatherCategory {
     data['code_values'] = codeValues;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'WeatherCategory: name: $name, unit: $unit, codeValues: $codeValues';
+  }
 }
