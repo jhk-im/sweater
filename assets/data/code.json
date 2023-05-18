@@ -21,22 +21,22 @@
   },
   "TMP" : {
     "name" : "기온(1시간)",
-    "unit" : "℃",
+    "unit" : "°C",
     "code_values" : []
   },
   "TMN" : {
     "name" : "최저기온",
-    "unit" : "℃",
+    "unit" : "°C",
     "code_values" : []
   },
   "TMX" : {
     "name" : "최고기온",
-    "unit" : "℃",
+    "unit" : "°C",
     "code_values" : []
   },
   "T1H" : {
     "name" : "기온",
-    "unit" : "℃",
+    "unit" : "°C",
     "code_values" : []
   },
   "UUU" : {

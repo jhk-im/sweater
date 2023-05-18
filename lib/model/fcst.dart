@@ -45,4 +45,9 @@ class Fcst {
     data['ny'] = ny;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'Fcst: { $weatherCategory, fcstValue: $fcstValue,  category: $category, nx: $nx, ny: $ny, fcstDate: $fcstDate, fcstTime: $fcstTime, baseDate: $baseDate, baseTime: $baseTime }';
+  }
 }

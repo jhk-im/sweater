@@ -11,8 +11,8 @@ class WeatherApi {
     Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst', {
       'dataType': 'JSON',
       'serviceKey': serviceKey ?? '',
-      'numOfRows': '${10}',
-      'pageNo': '${1}',
+      'numOfRows': '10',
+      'pageNo': '1',
       'base_date': date,
       'base_time': time,
       'nx': '$x',
@@ -27,12 +27,12 @@ class WeatherApi {
     Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst', {
       'dataType': 'JSON',
       'serviceKey': serviceKey ?? '',
-      'numOfRows': 10,
-      'pageNo': pageNo,
+      'numOfRows': '100',
+      'pageNo': '$pageNo',
       'base_date': date,
       'base_time': time,
-      'nx': x,
-      'ny': y,
+      'nx': '$x',
+      'ny': '$y',
     });
     return await http.get(url);
   }
@@ -43,12 +43,12 @@ class WeatherApi {
     Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getVilageFcst', {
       'dataType': 'JSON',
       'serviceKey': serviceKey ?? '',
-      'numOfRows': 10,
-      'pageNo': pageNo,
+      'numOfRows': '1000',
+      'pageNo': '$pageNo',
       'base_date': date,
       'base_time': time,
-      'nx': x,
-      'ny': y,
+      'nx': '$x',
+      'ny': '$y',
     });
     return await http.get(url);
   }

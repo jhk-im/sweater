@@ -21,6 +21,6 @@ class WeatherCategory {
 
   @override
   String toString() {
-    return 'WeatherCategory: name: $name, unit: $unit, codeValues: $codeValues';
+    return 'name: $name, unit: $unit, codeValues: $codeValues';
   }
 }

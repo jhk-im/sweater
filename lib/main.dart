@@ -8,8 +8,6 @@ import 'package:sweater/repository/weather_repository.dart';
 import 'package:sweater/utils/color_schemes.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'model/ncst.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // dotenv
@@ -21,14 +19,15 @@ void main() async {
   final repository = WeatherRepository(WeatherApi(), WeatherDao());
   runApp(const MyApp());
 
-  var list = await repository.getUltraStrNcst(false);
+  var list = await repository.getVilageFast(true);
   list.when(success: (info) {
-    for (var element in info) {
-      print(element.toString());
+    for (var e in info) {
+      print(e.toString());
     }
-  }, error: (error) {
-    print(error);
+  }, error: (e) {
+    print(e);
   });
+
 }
 
 class MyApp extends StatelessWidget {

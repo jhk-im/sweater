@@ -1,6 +1,6 @@
-// 실황 조회
 import 'package:sweater/model/weather_category.dart';
 
+// 실황 조회
 class Ncst {
   String? baseDate;
   String? baseTime;
@@ -40,6 +40,6 @@ class Ncst {
 
   @override
   String toString() {
-    return 'Ncst: {baseDate: $baseDate, baseTime: $baseTime, category: $category, nx: $nx, ny: $ny, obsrValue: $obsrValue, weatherCategory: $weatherCategory}';
+    return 'Ncst: { $weatherCategory, obsrValue: $obsrValue,  category: $category, nx: $nx, ny: $ny, baseDate: $baseDate, baseTime: $baseTime }';
   }
 }

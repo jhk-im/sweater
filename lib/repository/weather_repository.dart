@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:sweater/model/fcst.dart';
+import 'package:sweater/model/fcst_list.dart';
 import 'package:sweater/model/ncst.dart';
 import 'package:sweater/model/ncst_list.dart';
 import 'package:sweater/model/weather_category.dart';
@@ -15,12 +17,14 @@ class WeatherRepository {
 
   WeatherRepository(this._api, this._dao);
 
+  // 날씨 category 에 따른 정보 가져오기
   Future<WeatherCategory> getWeatherCode(String category) async {
     final jsonString = await rootBundle.loadString('assets/data/code.json');
     final jsonObject = jsonDecode(jsonString);
     return WeatherCategory.fromJson(jsonObject[category]);
   }
 
+  // 초단기 실황
   Future<Result<List<Ncst>>> getUltraStrNcst(bool fetchFromRemote) async {
     final localList = await _dao.getAllUltraNcstList();
     
@@ -47,6 +51,66 @@ class WeatherRepository {
       return Result.success(result);
     } catch (e) {
       return Result.error(Exception('getUltraStrNcst failed: ${e.toString()}'));
+    }
+  }
+
+  // 초단기 예보
+  Future<Result<List<Fcst>>> getUltraStrFcst(bool fetchFromRemote) async {
+    final localList = await _dao.getAllUltraFcstList();
+
+    final isDbEmpty = localList.isEmpty;
+    final shouldJustLoadFromCache = !isDbEmpty && !fetchFromRemote;
+
+    // local
+    if (shouldJustLoadFromCache) {
+      return Result.success(localList.map((e) => e.toFcst()).toList());
+    }
+
+    // remote
+    try {
+      final response = await _api.getUltraStrFcst('20230518', '2330', 55, 127, 1);
+      final jsonResult = jsonDecode(response.body);
+      FcstList list = FcstList.fromJson(jsonResult['response']['body']);
+      List<Fcst> result = [];
+      if (list.items?.item != null) {
+        for (var item in list.items!.item!) {
+          item.weatherCategory = await getWeatherCode(item.category ?? '');
+          result.add(item);
+        }
+      }
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(Exception('getUltraStrFcst failed: ${e.toString()}'));
+    }
+  }
+
+  // 단기 예보
+  Future<Result<List<Fcst>>> getVilageFast(bool fetchFromRemote) async {
+    final localList = await _dao.getAllVillageFcstList();
+
+    final isDbEmpty = localList.isEmpty;
+    final shouldJustLoadFromCache = !isDbEmpty && !fetchFromRemote;
+
+    // local
+    if (shouldJustLoadFromCache) {
+      return Result.success(localList.map((e) => e.toFcst()).toList());
+    }
+
+    // remote
+    try {
+      final response = await _api.getVilageFcst('20230518', '2300', 55, 127, 1);
+      final jsonResult = jsonDecode(response.body);
+      FcstList list = FcstList.fromJson(jsonResult['response']['body']);
+      List<Fcst> result = [];
+      if (list.items?.item != null) {
+        for (var item in list.items!.item!) {
+          item.weatherCategory = await getWeatherCode(item.category ?? '');
+          result.add(item);
+        }
+      }
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(Exception('getUltraStrFcst failed: ${e.toString()}'));
     }
   }
 }
