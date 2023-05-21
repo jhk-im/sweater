@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:sweater/model/dnsty.dart';
 import 'package:sweater/model/dnsty_list.dart';
 import 'package:sweater/model/fcst.dart';
@@ -10,12 +11,15 @@ import 'package:sweater/model/ncst_list.dart';
 import 'package:sweater/model/weather_category.dart';
 import 'package:sweater/repository/mapper/weather_mapper.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
+import 'package:sweater/repository/source/location_repository.dart';
 import 'package:sweater/repository/source/remote/weather_api.dart';
 import 'package:sweater/utils/result.dart';
 
 class WeatherRepository {
   final RemoteApi _api;
   final WeatherDao _dao;
+
+  LocationRepository locationRepository = LocationRepository();
 
   WeatherRepository(this._api, this._dao);
 
@@ -38,9 +42,22 @@ class WeatherRepository {
       return Result.success(localList.map((e) => e.toNcst()).toList());
     }
 
+    // get location
+    Position position = await locationRepository.getLocation();
+    print(position.longitude);
+    print(position.latitude);
+    int x = position.longitude.toInt();
+    int y = position.longitude.toInt();
+
+    String dt = DateTime.now().toString().replaceAll(RegExp("[^0-9\\s]"), "").replaceAll(" ", "");
+    String date = dt.substring(0, 8);
+    //int t = int.parse();
+    String time = dt.substring(8, 12);
+    //print(t);
+
     // remote
     try {
-      final response = await _api.getUltraStrNcst('20230518', '1400', 55, 127);
+      final response = await _api.getUltraStrNcst(date, time, x, y);
       final jsonResult = jsonDecode(response.body);
       NcstList list = NcstList.fromJson(jsonResult['response']['body']);
       List<Ncst> result = [];

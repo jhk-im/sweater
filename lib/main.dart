@@ -19,7 +19,7 @@ void main() async {
   final repository = WeatherRepository(RemoteApi(), WeatherDao());
   runApp(const MyApp());
 
-  var list = await repository.getMesureDnsty(false);
+  var list = await repository.getUltraStrNcst(false);
   list.when(success: (info) {
     for (var e in info) {
       print(e.toString());
