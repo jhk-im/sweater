@@ -4,6 +4,21 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class RemoteApi {
   static const baseUrl = "apis.data.go.kr";
   static final serviceKey = dotenv.env['SERVICE_KEY'];
+  static const kakaoUrl = "dapi.kakao.com";
+  static final apiKey = dotenv.env['API_KEY'];
+
+  // 좌표로 주소 검색
+  Future<http.Response> getAddressWithCoordinate(double x, double y) async {
+    var url =
+    Uri.https(kakaoUrl, '/v2/local/geo/coord2regioncode.json', {
+      'x': '$x',
+      'y': '$y',
+    });
+    var headers = <String, String> {
+      'Authorization': 'KakaoAK $apiKey',
+    };
+    return await http.get(url, headers: headers);
+  }
 
   // 초단기 실황
   Future<http.Response> getUltraStrNcst(String date, String time, int x, int y) async {

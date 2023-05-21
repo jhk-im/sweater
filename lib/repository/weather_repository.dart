@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:sweater/model/address.dart';
 import 'package:sweater/model/dnsty.dart';
 import 'package:sweater/model/dnsty_list.dart';
 import 'package:sweater/model/fcst.dart';
@@ -12,7 +13,7 @@ import 'package:sweater/model/weather_category.dart';
 import 'package:sweater/repository/mapper/weather_mapper.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
 import 'package:sweater/repository/source/location_repository.dart';
-import 'package:sweater/repository/source/remote/weather_api.dart';
+import 'package:sweater/repository/source/remote/remote_api.dart';
 import 'package:sweater/utils/result.dart';
 
 class WeatherRepository {
@@ -28,6 +29,19 @@ class WeatherRepository {
     final jsonString = await rootBundle.loadString('assets/data/code.json');
     final jsonObject = jsonDecode(jsonString);
     return WeatherCategory.fromJson(jsonObject[category]);
+  }
+
+  // 좌표로 주소 검색
+  Future<Result<Address>> getAddressWithCoordinate() async {
+    Position position = await locationRepository.getLocation();
+    // 주소
+    try {
+      final response = await _api.getAddressWithCoordinate(position.longitude, position.latitude);
+      print(response.body);
+    } catch (e) {
+      return Result.error(Exception('getUltraStrNcst failed: ${e.toString()}'));
+    }
+    return
   }
 
   // 초단기 실황
@@ -47,7 +61,7 @@ class WeatherRepository {
     print(position.longitude);
     print(position.latitude);
     int x = position.longitude.toInt();
-    int y = position.longitude.toInt();
+    int y = position.latitude.toInt();
 
     String dt = DateTime.now().toString().replaceAll(RegExp("[^0-9\\s]"), "").replaceAll(" ", "");
     String date = dt.substring(0, 8);

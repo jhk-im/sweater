@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sweater/repository/source/local/fcst_entity.dart';
 import 'package:sweater/repository/source/local/ncst_entity.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
-import 'package:sweater/repository/source/remote/weather_api.dart';
+import 'package:sweater/repository/source/remote/remote_api.dart';
 import 'package:sweater/repository/weather_repository.dart';
 import 'package:sweater/utils/color_schemes.dart';
 import 'package:hive_flutter/hive_flutter.dart';
