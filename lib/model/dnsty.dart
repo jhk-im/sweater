@@ -6,6 +6,9 @@ class Dnsty {
   String? coValue;
   String? pm10Flag;
   String? pm10Value;
+  String? pm10Value24;
+  String? pm25Value;
+  String? pm25Value24;
   String? o3Grade;
   String? khaiGrade;
   String? no2Flag;
@@ -26,6 +29,9 @@ class Dnsty {
         this.coValue,
         this.pm10Flag,
         this.pm10Value,
+        this.pm10Value24,
+        this.pm25Value,
+        this.pm25Value24,
         this.o3Grade,
         this.khaiGrade,
         this.no2Flag,
@@ -46,6 +52,9 @@ class Dnsty {
     coValue = json['coValue'];
     pm10Flag = json['pm10Flag'];
     pm10Value = json['pm10Value'];
+    pm10Value24 = json['pm10Value24'];
+    pm25Value = json['pm25Value'];
+    pm25Value24 = json['pm25Value24'];
     o3Grade = json['o3Grade'];
     khaiGrade = json['khaiGrade'];
     no2Flag = json['no2Flag'];
@@ -68,6 +77,9 @@ class Dnsty {
     data['coValue'] = coValue;
     data['pm10Flag'] = pm10Flag;
     data['pm10Value'] = pm10Value;
+    data['pm10Value24'] = pm10Value24;
+    data['pm25Value'] = pm25Value;
+    data['pm25Value24'] = pm25Value24;
     data['o3Grade'] = o3Grade;
     data['khaiGrade'] = khaiGrade;
     data['no2Flag'] = no2Flag;
@@ -84,6 +96,6 @@ class Dnsty {
 
   @override
   String toString() {
-    return 'Dnsty: { pm10Value: $pm10Value, khaiValue: $khaiValue, dateTime: $dataTime }';
+    return 'Dnsty: { 미세먼지: $pm10Value, 미세먼지24시간: $pm10Value24, 초미세먼지: $pm25Value, 초미세먼지24시간: $pm25Value24, dateTime: $dataTime }';
   }
 }

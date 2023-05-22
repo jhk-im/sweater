@@ -80,6 +80,9 @@ extension ToDnsty on DnstyEntity {
     dnsty.coValue = coValue;
     dnsty.pm10Flag = pm10Flag;
     dnsty.pm10Value = pm10Value;
+    dnsty.pm10Value24 = pm10Value24;
+    dnsty.pm25Value = pm25Value;
+    dnsty.pm25Value24 = pm25Value24;
     dnsty.o3Grade = o3Grade;
     dnsty.khaiGrade = khaiGrade;
     dnsty.no2Flag = no2Flag;
@@ -105,6 +108,9 @@ extension ToDnstyEntity on Dnsty {
     dnstyEntity.coValue = coValue;
     dnstyEntity.pm10Flag = pm10Flag;
     dnstyEntity.pm10Value = pm10Value;
+    dnstyEntity.pm10Value24 = pm10Value24;
+    dnstyEntity.pm25Value = pm25Value;
+    dnstyEntity.pm25Value24 = pm25Value24;
     dnstyEntity.o3Grade = o3Grade;
     dnstyEntity.khaiGrade = khaiGrade;
     dnstyEntity.no2Flag = no2Flag;

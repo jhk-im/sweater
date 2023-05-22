@@ -37,13 +37,13 @@ class RemoteApi {
   }
 
   // 초단기 예보
-  Future<http.Response> getUltraStrFcst(String date, String time, int x, int y, int pageNo) async {
+  Future<http.Response> getUltraStrFcst(String date, String time, int x, int y) async {
     var url =
     Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst', {
       'dataType': 'JSON',
       'serviceKey': serviceKey ?? '',
       'numOfRows': '100',
-      'pageNo': '$pageNo',
+      'pageNo': '1',
       'base_date': date,
       'base_time': time,
       'nx': '$x',
@@ -58,7 +58,7 @@ class RemoteApi {
     Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getVilageFcst', {
       'dataType': 'JSON',
       'serviceKey': serviceKey ?? '',
-      'numOfRows': '1000',
+      'numOfRows': '50',
       'pageNo': '$pageNo',
       'base_date': date,
       'base_time': time,
@@ -77,6 +77,7 @@ class RemoteApi {
       'pageNo': '1',
       'dataTerm': 'DAILY',
       'stationName': sName,
+      'ver': '1.1',
     });
     return await http.get(url);
   }

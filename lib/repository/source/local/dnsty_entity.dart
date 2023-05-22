@@ -17,7 +17,7 @@ class DnstyEntity extends HiveObject {
   @HiveField(5)
   String? pm10Flag; // 미세먼지플래그 (pm10)
   @HiveField(6)
-  String? pm10Value; // 미세먼지 24시간 예측이동 농도
+  String? pm10Value; // 미세먼지 농도
   @HiveField(7)
   String? o3Grade; // 오존지수
   @HiveField(8)
@@ -40,4 +40,10 @@ class DnstyEntity extends HiveObject {
   String? pm10Grade; // 미세먼지 24시간 등급
   @HiveField(17)
   String? o3Value; // 오존 농도
+  @HiveField(18)
+  String? pm25Value; // 초미세먼지
+  @HiveField(19)
+  String? pm25Value24; // 초미세먼지 24시간
+  @HiveField(20)
+  String? pm10Value24; // 미세먼지 24시간
 }
