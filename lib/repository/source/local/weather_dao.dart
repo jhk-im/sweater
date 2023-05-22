@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:sweater/repository/source/local/address_entity.dart';
 import 'package:sweater/repository/source/local/dnsty_entity.dart';
 import 'package:sweater/repository/source/local/fcst_entity.dart';
 import 'package:sweater/repository/source/local/ncst_entity.dart';
@@ -8,6 +9,7 @@ class WeatherDao {
   static const ultraFcstList = 'ultraFcstList';
   static const vilageFcstList = 'vilageFcstList';
   static const mesureDnstyList = 'mesureDnstyList';
+  static const addressList = 'addressList';
 
   // ultraNcst 추가
   Future<void> insertUltraNcstList(
@@ -85,6 +87,26 @@ class WeatherDao {
   // mesureDnsty getAll
   Future<List<DnstyEntity>> getAllMesureDnstyList() async {
     final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
+    return box.values.toList();
+  }
+
+  // address 추가
+  Future<void> insertAddressList(
+      AddressEntity address
+      ) async {
+    final box = await Hive.openBox<AddressEntity>('address');
+    await box.put(address.code, address);
+  }
+
+  // mesureDnsty 클리어
+  Future deleteAddress(String code) async {
+    final box = await Hive.openBox<AddressEntity>('address');
+    await box.delete(code);
+  }
+
+  // mesureDnsty getAll
+  Future<List<AddressEntity>> getAllAddressList() async {
+    final box = await Hive.openBox<AddressEntity>('address');
     return box.values.toList();
   }
 }

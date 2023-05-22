@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sweater/model/ncst.dart';
+import 'package:sweater/repository/source/local/address_entity.dart';
+import 'package:sweater/repository/source/local/dnsty_entity.dart';
 import 'package:sweater/repository/source/local/fcst_entity.dart';
 import 'package:sweater/repository/source/local/ncst_entity.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
@@ -16,14 +19,33 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(NcstEntityAdapter());
   Hive.registerAdapter(FcstEntityAdapter());
+  Hive.registerAdapter(DnstyEntityAdapter());
+  Hive.registerAdapter(AddressEntityAdapter());
   final repository = WeatherRepository(RemoteApi(), WeatherDao());
   runApp(const MyApp());
 
-  var list = await repository.getUltraStrNcst(false);
-  list.when(success: (info) {
-    for (var e in info) {
-      print(e.toString());
-    }
+  var address = await repository.getAddressWithCoordinate();
+  address.when(success: (adr) async {
+    print(adr);
+
+    var ultraNcst = await repository.getUltraStrNcst();
+    ultraNcst.when(success: (info) {
+      for (Ncst ncst in info) {
+        print(ncst);
+      }
+    }, error: (e) {
+      print(e);
+    });
+
+
+
+    var dnsty = await repository.getMesureDnsty(adr.region2depthName ?? '');
+    dnsty.when(success: (info) {
+      print(info);
+    }, error: (e) {
+      print(e);
+    });
+
   }, error: (e) {
     print(e);
   });

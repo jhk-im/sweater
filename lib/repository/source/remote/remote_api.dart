@@ -73,7 +73,7 @@ class RemoteApi {
     var url = Uri.https(baseUrl, '/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty', {
       'returnType': 'JSON',
       'serviceKey': serviceKey ?? '',
-      'numOfRows': '100',
+      'numOfRows': '1',
       'pageNo': '1',
       'dataTerm': 'DAILY',
       'stationName': sName,

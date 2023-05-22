@@ -45,4 +45,9 @@ class Address {
     data['y'] = y;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'Address: { region1depthName: $region1depthName, region2depthName: $region2depthName, region3depthName: $region3depthName, x: $x, y: $y }';
+  }
 }

@@ -1,7 +1,9 @@
+import 'package:sweater/model/address.dart';
 import 'package:sweater/model/dnsty.dart';
 import 'package:sweater/model/fcst.dart';
 import 'package:sweater/model/ncst.dart';
 import 'package:sweater/model/weather_category.dart';
+import 'package:sweater/repository/source/local/address_entity.dart';
 import 'package:sweater/repository/source/local/dnsty_entity.dart';
 import 'package:sweater/repository/source/local/fcst_entity.dart';
 import 'package:sweater/repository/source/local/ncst_entity.dart';
@@ -55,7 +57,7 @@ extension ToFcst on FcstEntity {
 extension ToFcstEntity on Fcst {
   FcstEntity toFcstEntity() {
     var entity =
-    FcstEntity(category: category ?? '', fcstValue: fcstValue ?? '');
+        FcstEntity(category: category ?? '', fcstValue: fcstValue ?? '');
     entity.baseTime = baseTime;
     entity.baseDate = baseDate;
     entity.fcstTime = fcstTime;
@@ -115,5 +117,38 @@ extension ToDnstyEntity on Dnsty {
     dnstyEntity.pm10Grade = pm10Grade;
     dnstyEntity.o3Value = o3Value;
     return dnstyEntity;
+  }
+}
+
+extension ToAddressEntity on Address {
+  AddressEntity toAddressEntity() {
+    var entity = AddressEntity();
+    entity.addressName = addressName;
+    entity.region1depthName = region1depthName;
+    entity.region2depthName = region2depthName;
+    entity.region3depthName = region3depthName;
+    entity.region4depthName = region4depthName;
+    entity.x = x;
+    entity.y = y;
+    entity.code = code;
+    entity.regionType = regionType;
+    return entity;
+  }
+}
+
+extension ToAddress on AddressEntity {
+  Address toAddress() {
+    var address = Address(
+      addressName: addressName,
+      region1depthName: region1depthName,
+      region2depthName: region2depthName,
+      region3depthName: region3depthName,
+      region4depthName: region4depthName,
+      x: x,
+      y: y,
+      code: code,
+      regionType: regionType,
+    );
+    return address;
   }
 }
