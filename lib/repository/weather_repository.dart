@@ -1,7 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:csv/csv.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:sweater/repository/source/csv/observatory_parser.dart';
+import 'package:sweater/repository/source/remote/dto/observatory_dto.dart';
 import 'package:sweater/repository/source/remote/model/address.dart';
 import 'package:sweater/repository/source/remote/model/adress_list.dart';
 import 'package:sweater/repository/source/remote/model/dnsty.dart';
@@ -10,6 +15,7 @@ import 'package:sweater/repository/source/remote/model/fcst.dart';
 import 'package:sweater/repository/source/remote/model/fcst_list.dart';
 import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/remote/model/ncst_list.dart';
+import 'package:sweater/repository/source/remote/model/observatory.dart';
 import 'package:sweater/repository/source/remote/model/rise_set.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/mapper/weather_mapper.dart';
@@ -51,6 +57,8 @@ class WeatherRepository {
     '2000',
   ];
 
+  final _observatoryParser = ObservatoryParser();
+
   LocationRepository locationRepository = LocationRepository();
 
   WeatherRepository(this._api, this._dao);
@@ -73,8 +81,7 @@ class WeatherRepository {
       final jsonResult = jsonDecode(response.body);
       AddressList result = AddressList.fromJson(jsonResult);
       Address address = Address();
-      if (result.documents != null)
-      {
+      if (result.documents != null) {
         address = result.documents![0];
         _dao.clearAddress();
         _dao.insertAddress(address.toAddressEntity());
@@ -186,8 +193,6 @@ class WeatherRepository {
       return Result.error(Exception('getMesureDnsty failed: ${e.toString()}'));
     }
   }
-
-
 
   // 초단기 실황
   Future<Result<List<Ncst>>> getUltraStrNcst(bool isRemote) async {
@@ -374,5 +379,12 @@ class WeatherRepository {
     final jsonString = await rootBundle.loadString('assets/data/code.json');
     final jsonObject = jsonDecode(jsonString);
     return WeatherCategory.fromJson(jsonObject[category]);
+  }
+
+  Future<List<Observatory>> getObservatory() async {
+    var csv = await rootBundle.loadString(
+      "assets/data/observatory_data.csv",
+    );
+    return await _observatoryParser.parse(csv);
   }
 }

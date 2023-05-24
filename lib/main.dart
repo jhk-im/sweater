@@ -27,6 +27,10 @@ void main() async {
   final repository = WeatherRepository(RemoteApi(), WeatherDao());
   runApp(const MyApp());
 
+  // 관측소 정보
+  var observatory = await repository.getObservatory();
+  print(observatory[0]);
+
   // 현재 좌표 주소
   var address = await repository.getAddressWithCoordinate();
   address.when(success: (adr) async {

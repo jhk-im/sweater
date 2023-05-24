@@ -1,8 +1,10 @@
 import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
+import 'package:sweater/repository/source/remote/dto/observatory_dto.dart';
 import 'package:sweater/repository/source/remote/model/address.dart';
 import 'package:sweater/repository/source/remote/model/dnsty.dart';
 import 'package:sweater/repository/source/remote/model/fcst.dart';
 import 'package:sweater/repository/source/remote/model/ncst.dart';
+import 'package:sweater/repository/source/remote/model/observatory.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/local/entity/address_entity.dart';
 import 'package:sweater/repository/source/local/entity/dnsty_entity.dart';
@@ -194,5 +196,27 @@ extension ToRiseSet on RiseSetEntity {
       latitudeNum: latitudeNum,
     );
     return address;
+  }
+}
+
+extension ToObservatory on ObservatoryDto {
+  Observatory toObservatory() {
+    //print(code);
+    return Observatory(
+      code: code,
+      depth1: depth1,
+      depth2: depth2,
+      depth3: depth3,
+      gridX: gridX,
+      gridY: gridY,
+      lonHour: lonHour,
+      lonMin: lonMin,
+      lonSec: lonSec,
+      latHour: latHour,
+      latMin: latMin,
+      latSec: latSec,
+      longitude: longitude,
+      latitude: latitude,
+    );
   }
 }
