@@ -1,12 +1,15 @@
-import 'package:sweater/model/address.dart';
-import 'package:sweater/model/dnsty.dart';
-import 'package:sweater/model/fcst.dart';
-import 'package:sweater/model/ncst.dart';
-import 'package:sweater/model/weather_category.dart';
-import 'package:sweater/repository/source/local/address_entity.dart';
-import 'package:sweater/repository/source/local/dnsty_entity.dart';
-import 'package:sweater/repository/source/local/fcst_entity.dart';
-import 'package:sweater/repository/source/local/ncst_entity.dart';
+import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
+import 'package:sweater/repository/source/remote/model/address.dart';
+import 'package:sweater/repository/source/remote/model/dnsty.dart';
+import 'package:sweater/repository/source/remote/model/fcst.dart';
+import 'package:sweater/repository/source/remote/model/ncst.dart';
+import 'package:sweater/repository/source/remote/model/weather_category.dart';
+import 'package:sweater/repository/source/local/entity/address_entity.dart';
+import 'package:sweater/repository/source/local/entity/dnsty_entity.dart';
+import 'package:sweater/repository/source/local/entity/fcst_entity.dart';
+import 'package:sweater/repository/source/local/entity/ncst_entity.dart';
+
+import '../remote/model/rise_set.dart';
 
 extension ToNcst on NcstEntity {
   Ncst toNcst() {
@@ -18,7 +21,8 @@ extension ToNcst on NcstEntity {
       ny: ny,
       obsrValue: obsrValue,
     );
-    ncst.weatherCategory = WeatherCategory(name: name, unit: unit);
+    ncst.weatherCategory =
+        WeatherCategory(name: name, unit: unit, codeValues: codeValues);
     return ncst;
   }
 }
@@ -33,6 +37,7 @@ extension ToNcstEntity on Ncst {
     entity.ny = ny;
     entity.name = weatherCategory?.name ?? '';
     entity.unit = weatherCategory?.unit ?? '';
+    entity.codeValues = weatherCategory?.codeValues ?? [];
     return entity;
   }
 }
@@ -49,7 +54,8 @@ extension ToFcst on FcstEntity {
       nx: nx,
       ny: ny,
     );
-    fcst.weatherCategory = WeatherCategory(name: name, unit: unit);
+    fcst.weatherCategory =
+        WeatherCategory(name: name, unit: unit, codeValues: codeValues);
     return fcst;
   }
 }
@@ -64,6 +70,7 @@ extension ToFcstEntity on Fcst {
     entity.fcstDate = fcstDate;
     entity.nx = nx;
     entity.ny = ny;
+    entity.codeValues = weatherCategory?.codeValues ?? [];
     entity.name = weatherCategory?.name ?? '';
     entity.unit = weatherCategory?.unit ?? '';
     return entity;
@@ -154,6 +161,37 @@ extension ToAddress on AddressEntity {
       y: y,
       code: code,
       regionType: regionType,
+    );
+    return address;
+  }
+}
+
+extension ToRiseSetEntity on RiseSet {
+  RiseSetEntity toRiseSetEntity() {
+    var entity = RiseSetEntity();
+    entity.locdate = locdate;
+    entity.location = location;
+    entity.sunrise = sunrise;
+    entity.sunset = sunset;
+    entity.moonrise = moonrise;
+    entity.moonset = moonset;
+    entity.longitudeNum = longitudeNum;
+    entity.latitudeNum = latitudeNum;
+    return entity;
+  }
+}
+
+extension ToRiseSet on RiseSetEntity {
+  RiseSet toRiseSet() {
+    var address = RiseSet(
+      locdate: locdate,
+      location: location,
+      sunrise: sunrise,
+      sunset: sunset,
+      moonrise: moonrise,
+      moonset: moonset,
+      longitudeNum: longitudeNum,
+      latitudeNum: latitudeNum,
     );
     return address;
   }

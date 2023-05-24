@@ -1,4 +1,4 @@
-import 'package:sweater/model/weather_category.dart';
+import 'package:sweater/repository/source/remote/model/weather_category.dart';
 
 // 실황 조회
 class Ncst {

@@ -1,4 +1,4 @@
-import 'package:sweater/model/address.dart';
+import 'package:sweater/repository/source/remote/model/address.dart';
 
 class AddressList {
   Meta? meta;

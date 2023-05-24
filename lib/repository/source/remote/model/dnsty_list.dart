@@ -1,4 +1,4 @@
-import 'package:sweater/model/dnsty.dart';
+import 'package:sweater/repository/source/remote/model/dnsty.dart';
 
 class DnstyList {
   int? totalCount;

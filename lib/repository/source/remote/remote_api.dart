@@ -53,13 +53,13 @@ class RemoteApi {
   }
 
   // 단기 예보
-  Future<http.Response> getVilageFcst(String date, String time, int x, int y, int pageNo) async {
+  Future<http.Response> getVilageFcst(String date, String time, int x, int y) async {
     var url =
     Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getVilageFcst', {
       'dataType': 'JSON',
       'serviceKey': serviceKey ?? '',
-      'numOfRows': '50',
-      'pageNo': '$pageNo',
+      'numOfRows': '60',
+      'pageNo': '1',
       'base_date': date,
       'base_time': time,
       'nx': '$x',
@@ -80,5 +80,20 @@ class RemoteApi {
       'ver': '1.1',
     });
     return await http.get(url);
+  }
+
+  // 좌표로 출몰시간 조회 (XML)
+  Future<http.Response> getRiseSetInfoWithCoordinate(String locdate,double longitude, double latitude) async {
+    var url =
+    Uri.https(baseUrl, '/B090041/openapi/service/RiseSetInfoService/getLCRiseSetInfo', {
+      'locdate': locdate,
+      'longitude': '$longitude',
+      'latitude': '$latitude',
+      'dnYn': 'Y',
+    });
+    var headers = <String, String> {
+      'Authorization': 'KakaoAK $apiKey',
+    };
+    return await http.get(url, headers: headers);
   }
 }

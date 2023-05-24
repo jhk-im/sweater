@@ -1,8 +1,9 @@
 import 'package:hive/hive.dart';
-import 'package:sweater/repository/source/local/address_entity.dart';
-import 'package:sweater/repository/source/local/dnsty_entity.dart';
-import 'package:sweater/repository/source/local/fcst_entity.dart';
-import 'package:sweater/repository/source/local/ncst_entity.dart';
+import 'package:sweater/repository/source/local/entity/address_entity.dart';
+import 'package:sweater/repository/source/local/entity/dnsty_entity.dart';
+import 'package:sweater/repository/source/local/entity/fcst_entity.dart';
+import 'package:sweater/repository/source/local/entity/ncst_entity.dart';
+import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
 
 class WeatherDao {
   static const ultraNcstList = 'ultraNcstList';
@@ -10,6 +11,7 @@ class WeatherDao {
   static const vilageFcstList = 'vilageFcstList';
   static const mesureDnstyList = 'mesureDnstyList';
   static const addressList = 'addressList';
+  static const riseSet = 'riseSet';
 
   // ultraNcst 추가
   Future<void> insertUltraNcstList(
@@ -107,6 +109,26 @@ class WeatherDao {
   // mesureDnsty getAll
   Future<List<AddressEntity>> getAllAddressList() async {
     final box = await Hive.openBox<AddressEntity>('address');
+    return box.values.toList();
+  }
+
+  // riseSet 추가
+  Future<void> insertRiseInfo(
+      RiseSetEntity riseSet
+      ) async {
+    final box = await Hive.openBox<RiseSetEntity>('riseSet');
+    await box.add(riseSet);
+  }
+
+  // riseSet 클리어
+  Future clearRiseInfo() async {
+    final box = await Hive.openBox<RiseSetEntity>('riseSet');
+    await box.clear();
+  }
+
+  // riseSet getAll
+  Future<List<RiseSetEntity>> getAllRiseSet() async {
+    final box = await Hive.openBox<RiseSetEntity>('riseSet');
     return box.values.toList();
   }
 }

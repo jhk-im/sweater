@@ -2,18 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:sweater/model/address.dart';
-import 'package:sweater/model/adress_list.dart';
-import 'package:sweater/model/dnsty.dart';
-import 'package:sweater/model/dnsty_list.dart';
-import 'package:sweater/model/fcst.dart';
-import 'package:sweater/model/fcst_list.dart';
-import 'package:sweater/model/ncst.dart';
-import 'package:sweater/model/ncst_list.dart';
-import 'package:sweater/model/weather_category.dart';
-import 'package:sweater/repository/mapper/weather_mapper.dart';
+import 'package:sweater/repository/source/remote/model/address.dart';
+import 'package:sweater/repository/source/remote/model/adress_list.dart';
+import 'package:sweater/repository/source/remote/model/dnsty.dart';
+import 'package:sweater/repository/source/remote/model/dnsty_list.dart';
+import 'package:sweater/repository/source/remote/model/fcst.dart';
+import 'package:sweater/repository/source/remote/model/fcst_list.dart';
+import 'package:sweater/repository/source/remote/model/ncst.dart';
+import 'package:sweater/repository/source/remote/model/ncst_list.dart';
+import 'package:sweater/repository/source/remote/model/rise_set.dart';
+import 'package:sweater/repository/source/remote/model/weather_category.dart';
+import 'package:sweater/repository/source/mapper/weather_mapper.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
-import 'package:sweater/repository/source/location_repository.dart';
+import 'package:sweater/repository/location_repository.dart';
 import 'package:sweater/repository/source/remote/remote_api.dart';
 import 'package:sweater/utils/convert_gps.dart';
 import 'package:sweater/utils/result.dart';
@@ -52,7 +53,7 @@ class WeatherRepository {
 
   WeatherRepository(this._api, this._dao);
 
-  // 현재 좌표 주소 검색
+  // 현재 좌표 주소 조회
   Future<Result<Address>> getAddressWithCoordinate() async {
     final localList = await _dao.getAllAddressList();
     Position position = await locationRepository.getLocation();
@@ -83,23 +84,81 @@ class WeatherRepository {
     }
   }
 
-  // 날씨 category 에 따른 정보 가져오기
-  Future<WeatherCategory> getWeatherCode(String category) async {
-    final jsonString = await rootBundle.loadString('assets/data/code.json');
-    final jsonObject = jsonDecode(jsonString);
-    return WeatherCategory.fromJson(jsonObject[category]);
+  // 현재 좌표 출몰 조회
+  /*Future<Result<RiseSet>> getRiseSetWithCoordinate() async {
+    final localList = await _dao.getAllRiseSet();
+    // 로컬에 있고 날짜가 변경되지 않은 경우
+    if (localList.isNotEmpty) {
+      DateTime dateTime = DateTime.now();
+      int currentDate = int.parse(dateTime.toString().substring(0, 8));
+      if (currentDate == localList[0].locdate) {
+
+      }
+    }
+
+    Position position = await locationRepository.getLocation();
+
+  }*/
+
+  // 측정소별 미세먼지
+  Future<Result<List<Dnsty>>> getMesureDnsty(bool isRemote) async {
+    final localList = await _dao.getAllMesureDnstyList();
+
+    // local
+    if (!isRemote && localList.isNotEmpty) {
+      if (localList[0].dataTime != null) {
+        // 30분 전
+        DateTime dateTime = DateTime.now();
+        String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
+            dateTime.hour, dateTime.minute - 30)
+            .toString()
+            .replaceAll(RegExp("[^0-9\\s]"), "")
+            .replaceAll(" ", "");
+        String currentDate = dt.substring(0, 8);
+        String dataTime = localList[0].dataTime!;
+        String prevDate = dataTime.substring(0, 10).replaceAll("-", "");
+        String currentTime = dt.substring(8, 10);
+        String prevTime =
+        dataTime.substring(dataTime.length - 5, dataTime.length - 3);
+
+        if (currentDate == prevDate && currentTime == prevTime) {
+          print('getMesureDnsty() -> local return');
+          return Result.success(localList.map((e) => e.toDnsty()).toList());
+        }
+      }
+    }
+
+    final address = await _dao.getAllAddressList();
+    String query =
+    address[0].region2depthName != null ? address[0].region2depthName! : '';
+
+    // remote
+    try {
+      final response = await _api.getMsrstnAcctoRltmMesureDnsty(query);
+      final jsonResult = jsonDecode(response.body);
+      DnstyList list = DnstyList.fromJson(jsonResult['response']['body']);
+      List<Dnsty> result = [];
+      if (list.items != null) {
+        for (var item in list.items!) {
+          result.add(item);
+        }
+      }
+      // 로컬 업데이트
+      if (result.isNotEmpty) {
+        _dao.clearMesureDnstyList();
+        _dao.insertMesureDnstyList(
+            result.map((e) => e.toDnstyEntity()).toList());
+      }
+      print('getMesureDnsty() -> api return');
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(Exception('getMesureDnsty failed: ${e.toString()}'));
+    }
   }
 
   // 초단기 실황
-  Future<Result<List<Ncst>>> getUltraStrNcst() async {
+  Future<Result<List<Ncst>>> getUltraStrNcst(bool isRemote) async {
     final localList = await _dao.getAllUltraNcstList();
-
-    // get location
-    Position position = await locationRepository.getLocation();
-    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
-    int x = gpsToData['x'];
-    int y = gpsToData['y'];
-    //print(gpsToData);
 
     // 30분 전
     DateTime dateTime = DateTime.now();
@@ -113,7 +172,7 @@ class WeatherRepository {
     String checkTime = dt.substring(8, 10);
 
     // local
-    if (localList.isNotEmpty) {
+    if (!isRemote && localList.isNotEmpty) {
       if (localList[0].baseTime != null) {
         String localTime = localList[0].baseTime!.substring(0, 2);
         String localDate = localList[0].baseDate ?? '';
@@ -125,6 +184,13 @@ class WeatherRepository {
         }
       }
     }
+
+    // get location
+    Position position = await locationRepository.getLocation();
+    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
+    int x = gpsToData['x'];
+    int y = gpsToData['y'];
+    //print(gpsToData);
 
     // remote
     try {
@@ -151,14 +217,8 @@ class WeatherRepository {
   }
 
   // 초단기 예보
-  Future<Result<List<Fcst>>> getUltraStrFcst() async {
+  Future<Result<List<Fcst>>> getUltraStrFcst(bool isRemote) async {
     final localList = await _dao.getAllUltraFcstList();
-
-    // get location
-    Position position = await locationRepository.getLocation();
-    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
-    int x = gpsToData['x'];
-    int y = gpsToData['y'];
 
     // 45분 전
     DateTime dateTime = DateTime.now();
@@ -172,7 +232,7 @@ class WeatherRepository {
     String checkTime = dt.substring(8, 10);
 
     // local
-    if (localList.isNotEmpty) {
+    if (!isRemote && localList.isNotEmpty) {
       if (localList[0].baseTime != null) {
         String localTime = localList[0].baseTime!.substring(0, 2);
         String localDate = localList[0].baseDate ?? '';
@@ -184,6 +244,12 @@ class WeatherRepository {
         }
       }
     }
+
+    // get location
+    Position position = await locationRepository.getLocation();
+    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
+    int x = gpsToData['x'];
+    int y = gpsToData['y'];
 
     // remote
     try {
@@ -210,14 +276,8 @@ class WeatherRepository {
   }
 
   // 단기 예보
-  Future<Result<List<Fcst>>> getVilageFast(int pageNo) async {
+  Future<Result<List<Fcst>>> getVilageFast(bool isRemote) async {
     final localList = await _dao.getAllVillageFcstList();
-
-    // get location
-    Position position = await locationRepository.getLocation();
-    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
-    int x = gpsToData['x'];
-    int y = gpsToData['y'];
 
     // 30분 전
     DateTime dateTime = DateTime.now();
@@ -232,7 +292,7 @@ class WeatherRepository {
     String time = baseTimeList[checkTimeIndex];
 
     // local
-    if (localList.isNotEmpty) {
+    if (!isRemote && localList.isNotEmpty) {
       if (localList[0].baseTime != null) {
         String localTime = localList[0].baseTime!.substring(0, 2);
         String callTime = time.substring(0, 2);
@@ -246,9 +306,15 @@ class WeatherRepository {
       }
     }
 
+    // get location
+    Position position = await locationRepository.getLocation();
+    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
+    int x = gpsToData['x'];
+    int y = gpsToData['y'];
+
     // remote
     try {
-      final response = await _api.getVilageFcst(date, time, x, y, pageNo);
+      final response = await _api.getVilageFcst(date, time, x, y);
       final jsonResult = jsonDecode(response.body);
       FcstList list = FcstList.fromJson(jsonResult['response']['body']);
       List<Fcst> result = [];
@@ -270,58 +336,10 @@ class WeatherRepository {
     }
   }
 
-  // 측정소별 미세먼지
-  Future<Result<List<Dnsty>>> getMesureDnsty() async {
-    final address = await _dao.getAllAddressList();
-    String query =
-        address[0].region2depthName != null ? address[0].region2depthName! : '';
-    final localList = await _dao.getAllMesureDnstyList();
-
-    // local
-    if (localList.isNotEmpty) {
-      if (localList[0].dataTime != null) {
-        // 30분 전
-        DateTime dateTime = DateTime.now();
-        String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-                dateTime.hour, dateTime.minute - 30)
-            .toString()
-            .replaceAll(RegExp("[^0-9\\s]"), "")
-            .replaceAll(" ", "");
-        String currentDate = dt.substring(0, 8);
-        String dataTime = localList[0].dataTime!;
-        String prevDate = dataTime.substring(0, 10).replaceAll("-", "");
-        String currentTime = dt.substring(8, 10);
-        String prevTime =
-            dataTime.substring(dataTime.length - 5, dataTime.length - 3);
-
-        if (currentDate == prevDate && currentTime == prevTime) {
-          print('getMesureDnsty() -> local return');
-          return Result.success(localList.map((e) => e.toDnsty()).toList());
-        }
-      }
-    }
-
-    // remote
-    try {
-      final response = await _api.getMsrstnAcctoRltmMesureDnsty(query);
-      final jsonResult = jsonDecode(response.body);
-      DnstyList list = DnstyList.fromJson(jsonResult['response']['body']);
-      List<Dnsty> result = [];
-      if (list.items != null) {
-        for (var item in list.items!) {
-          result.add(item);
-        }
-      }
-      // 로컬 업데이트
-      if (result.isNotEmpty) {
-        _dao.clearMesureDnstyList();
-        _dao.insertMesureDnstyList(
-            result.map((e) => e.toDnstyEntity()).toList());
-      }
-      print('getMesureDnsty() -> api return');
-      return Result.success(result);
-    } catch (e) {
-      return Result.error(Exception('getMesureDnsty failed: ${e.toString()}'));
-    }
+  // 날씨 category 에 따른 정보 가져오기
+  Future<WeatherCategory> getWeatherCode(String category) async {
+    final jsonString = await rootBundle.loadString('assets/data/code.json');
+    final jsonObject = jsonDecode(jsonString);
+    return WeatherCategory.fromJson(jsonObject[category]);
   }
 }

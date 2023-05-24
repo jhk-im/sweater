@@ -1,4 +1,4 @@
-import 'package:sweater/model/fcst.dart';
+import 'package:sweater/repository/source/remote/model/fcst.dart';
 // 초단기 예보 조회, 단기 예보 조회
 class FcstList {
   String? dataType;

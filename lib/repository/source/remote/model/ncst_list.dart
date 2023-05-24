@@ -1,4 +1,4 @@
-import 'package:sweater/model/ncst.dart';
+import 'package:sweater/repository/source/remote/model/ncst.dart';
 // 초단기 실황 조회
 class NcstList {
   String? dataType;
