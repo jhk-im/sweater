@@ -19,14 +19,14 @@ class RiseSet {
     // this.nautm,
     // this.suntransit,
   });
-  int? locdate;
+  String? locdate;
   String? location;
-  int? sunrise;
-  int? sunset;
-  int? moonrise;
-  int? moonset;
-  double? longitudeNum;
-  double? latitudeNum;
+  String? sunrise;
+  String? sunset;
+  String? moonrise;
+  String? moonset;
+  String? longitudeNum;
+  String? latitudeNum;
 
   // int? aste;
   // int? astm;
@@ -40,14 +40,14 @@ class RiseSet {
   // int? suntransit;
 
   factory RiseSet.fromJson(Map<String, dynamic> json) => RiseSet(
-    locdate: json["locdate"],
-    location: json["location"],
-    sunrise: json["sunrise"],
-    sunset: json["sunset"],
-    moonrise: json["moonrise"],
-    moonset: json["moonset"],
-    longitudeNum: json["longitudeNum"].toDouble(),
-    latitudeNum: json["latitudeNum"].toDouble(),
+    locdate: json["locdate"].toString().replaceAll(" ", "").replaceAll("-", ""),
+    location: json["location"].toString().replaceAll(" ", "").replaceAll("-", ""),
+    sunrise: json["sunrise"].toString().replaceAll(" ", "").replaceAll("-", ""),
+    sunset: json["sunset"].toString().replaceAll(" ", "").replaceAll("-", ""),
+    moonrise: json["moonrise"].toString().replaceAll(" ", "").replaceAll("-", ""),
+    moonset: json["moonset"].toString().replaceAll(" ", "").replaceAll("-", ""),
+    longitudeNum: json["longitudeNum"].toString().replaceAll(" ", "").replaceAll("-", ""),
+    latitudeNum: json["latitudeNum"].toString().replaceAll(" ", "").replaceAll("-", ""),
     // aste: json["aste"],
     // astm: json["astm"],
     // civile: json["civile"],
@@ -80,4 +80,10 @@ class RiseSet {
     // "nautm": nautm,
     // "suntransit": suntransit,
   };
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return 'RiseSet: { locdate: $locdate,  location: $location, sunrise: $sunrise, sunset: $sunset, moonrise: $moonrise, moonset: $moonset, longitudeNum: $longitudeNum, latitudeNum: $latitudeNum }';
+  }
 }

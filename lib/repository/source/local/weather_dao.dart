@@ -6,12 +6,81 @@ import 'package:sweater/repository/source/local/entity/ncst_entity.dart';
 import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
 
 class WeatherDao {
+  static const addressList = 'addressList';
+  // address 추가
+  Future<void> insertAddress(
+      AddressEntity address
+      ) async {
+    final box = await Hive.openBox<AddressEntity>('address');
+    await box.add(address);
+  }
+
+  // address 변경
+  Future<void> updateAddress(
+      AddressEntity address
+      ) async {
+    final box = await Hive.openBox<AddressEntity>('address');
+    await box.put(address.code, address);
+  }
+
+  // address 클리어
+  Future clearAddress() async {
+    final box = await Hive.openBox<AddressEntity>('address');
+    await box.clear();
+  }
+
+  // address getAll
+  Future<List<AddressEntity>> getAllAddressList() async {
+    final box = await Hive.openBox<AddressEntity>('address');
+    return box.values.toList();
+  }
+
+  static const riseSet = 'riseSet';
+  // riseSet 추가
+
+  Future<void> insertRiseInfo(
+      RiseSetEntity riseSet
+      ) async {
+    final box = await Hive.openBox<RiseSetEntity>('riseSet');
+    await box.add(riseSet);
+  }
+
+  // riseSet 클리어
+  Future clearRiseSet() async {
+    final box = await Hive.openBox<RiseSetEntity>('riseSet');
+    await box.clear();
+  }
+
+  // riseSet getAll
+  Future<List<RiseSetEntity>> getAllRiseSet() async {
+    final box = await Hive.openBox<RiseSetEntity>('riseSet');
+    return box.values.toList();
+  }
+
+  static const mesureDnstyList = 'mesureDnstyList';
+  // mesureDnsty 추가
+  Future<void> insertMesureDnstyList(
+      List<DnstyEntity> dnstyEntities
+      ) async {
+    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
+    await box.addAll(dnstyEntities);
+  }
+
+  // mesureDnsty 클리어
+  Future clearMesureDnstyList() async {
+    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
+    await box.clear();
+  }
+
+  // mesureDnsty getAll
+  Future<List<DnstyEntity>> getAllMesureDnstyList() async {
+    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
+    return box.values.toList();
+  }
+
   static const ultraNcstList = 'ultraNcstList';
   static const ultraFcstList = 'ultraFcstList';
   static const vilageFcstList = 'vilageFcstList';
-  static const mesureDnstyList = 'mesureDnstyList';
-  static const addressList = 'addressList';
-  static const riseSet = 'riseSet';
 
   // ultraNcst 추가
   Future<void> insertUltraNcstList(
@@ -69,66 +138,6 @@ class WeatherDao {
   // vilageFcst getAll
   Future<List<FcstEntity>> getAllVillageFcstList() async {
     final box = await Hive.openBox<FcstEntity>('vilageFcst');
-    return box.values.toList();
-  }
-
-  // mesureDnsty 추가
-  Future<void> insertMesureDnstyList(
-      List<DnstyEntity> dnstyEntities
-      ) async {
-    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
-    await box.addAll(dnstyEntities);
-  }
-
-  // mesureDnsty 클리어
-  Future clearMesureDnstyList() async {
-    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
-    await box.clear();
-  }
-
-  // mesureDnsty getAll
-  Future<List<DnstyEntity>> getAllMesureDnstyList() async {
-    final box = await Hive.openBox<DnstyEntity>('mesureDnsty');
-    return box.values.toList();
-  }
-
-  // address 추가
-  Future<void> insertAddressList(
-      AddressEntity address
-      ) async {
-    final box = await Hive.openBox<AddressEntity>('address');
-    await box.put(address.code, address);
-  }
-
-  // mesureDnsty 클리어
-  Future deleteAddress(String code) async {
-    final box = await Hive.openBox<AddressEntity>('address');
-    await box.delete(code);
-  }
-
-  // mesureDnsty getAll
-  Future<List<AddressEntity>> getAllAddressList() async {
-    final box = await Hive.openBox<AddressEntity>('address');
-    return box.values.toList();
-  }
-
-  // riseSet 추가
-  Future<void> insertRiseInfo(
-      RiseSetEntity riseSet
-      ) async {
-    final box = await Hive.openBox<RiseSetEntity>('riseSet');
-    await box.add(riseSet);
-  }
-
-  // riseSet 클리어
-  Future clearRiseInfo() async {
-    final box = await Hive.openBox<RiseSetEntity>('riseSet');
-    await box.clear();
-  }
-
-  // riseSet getAll
-  Future<List<RiseSetEntity>> getAllRiseSet() async {
-    final box = await Hive.openBox<RiseSetEntity>('riseSet');
     return box.values.toList();
   }
 }

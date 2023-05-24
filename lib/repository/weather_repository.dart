@@ -18,6 +18,8 @@ import 'package:sweater/repository/location_repository.dart';
 import 'package:sweater/repository/source/remote/remote_api.dart';
 import 'package:sweater/utils/convert_gps.dart';
 import 'package:sweater/utils/result.dart';
+import 'package:xml/xml.dart';
+import 'package:xml2json/xml2json.dart';
 
 class WeatherRepository {
   final RemoteApi _api;
@@ -60,10 +62,8 @@ class WeatherRepository {
 
     // 로컬에 있고 좌표값 변경이 없는 경우 로컬 리턴
     if (localList.isNotEmpty) {
-      if (localList[0].x == position.longitude &&
-          localList[0].y == position.latitude) {
-        return Result.success(localList[0].toAddress());
-      }
+      print('getAddressWithCoordinate() -> local return');
+      return Result.success(localList[0].toAddress());
     }
 
     // 카카오 주소 검색
@@ -73,10 +73,13 @@ class WeatherRepository {
       final jsonResult = jsonDecode(response.body);
       AddressList result = AddressList.fromJson(jsonResult);
       Address address = Address();
-      if (result.documents != null) {
+      if (result.documents != null)
+      {
         address = result.documents![0];
-        _dao.insertAddressList(address.toAddressEntity());
+        _dao.clearAddress();
+        _dao.insertAddress(address.toAddressEntity());
       }
+      print('getAddressWithCoordinate() -> api return');
       return Result.success(address);
     } catch (e) {
       return Result.error(
@@ -85,20 +88,48 @@ class WeatherRepository {
   }
 
   // 현재 좌표 출몰 조회
-  /*Future<Result<RiseSet>> getRiseSetWithCoordinate() async {
+  Future<Result<RiseSet>> getRiseSetWithCoordinate() async {
     final localList = await _dao.getAllRiseSet();
-    // 로컬에 있고 날짜가 변경되지 않은 경우
-    if (localList.isNotEmpty) {
-      DateTime dateTime = DateTime.now();
-      int currentDate = int.parse(dateTime.toString().substring(0, 8));
-      if (currentDate == localList[0].locdate) {
+    String dateTime = DateTime.now()
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String currentDate = dateTime.toString().substring(0, 8);
 
-      }
+    // 로컬에 있고 날짜가 변경되지 않은 경우
+    if (localList.isNotEmpty && currentDate == localList[0].locdate) {
+      print('getRiseSetWithCoordinate() -> local return');
+      return Result.success(localList[0].toRiseSet());
     }
 
     Position position = await locationRepository.getLocation();
 
-  }*/
+    // remote
+    try {
+      final response = await _api.getRiseSetInfoWithCoordinate(
+          currentDate, position.longitude, position.latitude);
+
+      final xmlResult = XmlDocument.parse(utf8.decode(response.bodyBytes))
+          .findAllElements('item');
+
+      final jsonTransformer = Xml2Json();
+      jsonTransformer.parse(xmlResult.toString());
+      var json = jsonDecode(jsonTransformer.toParker());
+
+      RiseSet result = RiseSet.fromJson(json['item']);
+
+      // 로컬 업데이트
+      if (result.locdate != null) {
+        _dao.clearRiseSet();
+        _dao.insertRiseInfo(result.toRiseSetEntity());
+      }
+      print('getRiseSetWithCoordinate() -> api return');
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(
+          Exception('getRiseSetWithCoordinate failed: ${e.toString()}'));
+    }
+  }
 
   // 측정소별 미세먼지
   Future<Result<List<Dnsty>>> getMesureDnsty(bool isRemote) async {
@@ -110,7 +141,7 @@ class WeatherRepository {
         // 30분 전
         DateTime dateTime = DateTime.now();
         String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-            dateTime.hour, dateTime.minute - 30)
+                dateTime.hour, dateTime.minute - 30)
             .toString()
             .replaceAll(RegExp("[^0-9\\s]"), "")
             .replaceAll(" ", "");
@@ -119,7 +150,7 @@ class WeatherRepository {
         String prevDate = dataTime.substring(0, 10).replaceAll("-", "");
         String currentTime = dt.substring(8, 10);
         String prevTime =
-        dataTime.substring(dataTime.length - 5, dataTime.length - 3);
+            dataTime.substring(dataTime.length - 5, dataTime.length - 3);
 
         if (currentDate == prevDate && currentTime == prevTime) {
           print('getMesureDnsty() -> local return');
@@ -130,7 +161,7 @@ class WeatherRepository {
 
     final address = await _dao.getAllAddressList();
     String query =
-    address[0].region2depthName != null ? address[0].region2depthName! : '';
+        address[0].region2depthName != null ? address[0].region2depthName! : '';
 
     // remote
     try {
@@ -155,6 +186,8 @@ class WeatherRepository {
       return Result.error(Exception('getMesureDnsty failed: ${e.toString()}'));
     }
   }
+
+
 
   // 초단기 실황
   Future<Result<List<Ncst>>> getUltraStrNcst(bool isRemote) async {

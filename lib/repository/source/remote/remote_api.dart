@@ -86,14 +86,12 @@ class RemoteApi {
   Future<http.Response> getRiseSetInfoWithCoordinate(String locdate,double longitude, double latitude) async {
     var url =
     Uri.https(baseUrl, '/B090041/openapi/service/RiseSetInfoService/getLCRiseSetInfo', {
+      'serviceKey': serviceKey ?? '',
       'locdate': locdate,
       'longitude': '$longitude',
       'latitude': '$latitude',
       'dnYn': 'Y',
     });
-    var headers = <String, String> {
-      'Authorization': 'KakaoAK $apiKey',
-    };
-    return await http.get(url, headers: headers);
+    return await http.get(url);
   }
 }

@@ -1,23 +1,25 @@
 import 'package:hive/hive.dart';
 
+part 'rise_set_entity.g.dart';
+
 @HiveType(typeId: 4)
 class RiseSetEntity extends HiveObject {
   @HiveField(0)
-  int? locdate;
+  String? locdate;
   @HiveField(1)
   String? location;
   @HiveField(2)
-  int? sunrise;
+  String? sunrise;
   @HiveField(3)
-  int? sunset;
+  String? sunset;
   @HiveField(4)
-  int? moonrise;
+  String? moonrise;
   @HiveField(5)
-  int? moonset;
+  String? moonset;
   @HiveField(6)
-  double? longitudeNum;
+  String? longitudeNum;
   @HiveField(7)
-  double? latitudeNum;
+  String? latitudeNum;
   // int? astm;
   // int? civile;
   // int? civilm;
