@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sweater/repository/source/local/entity/observatory_entity.dart';
 import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
+import 'package:sweater/repository/source/local/entity/uv_rays_entity.dart';
 import 'package:sweater/repository/source/remote/model/fcst.dart';
 import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/local/entity/address_entity.dart';
@@ -15,8 +17,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   // dotenv
   await dotenv.load(fileName: 'assets/.env');
+
   // hive
   await Hive.initFlutter();
   Hive.registerAdapter(NcstEntityAdapter());
@@ -24,33 +28,66 @@ void main() async {
   Hive.registerAdapter(DnstyEntityAdapter());
   Hive.registerAdapter(AddressEntityAdapter());
   Hive.registerAdapter(RiseSetEntityAdapter());
+  Hive.registerAdapter(ObservatoryEntityAdapter());
+  Hive.registerAdapter(UVRaysEntityAdapter());
+
+  // repository
   final repository = WeatherRepository(RemoteApi(), WeatherDao());
   runApp(const MyApp());
-
-  // 관측소 정보
-  var observatory = await repository.getObservatory();
-  print(observatory[0]);
 
   // 현재 좌표 주소
   var address = await repository.getAddressWithCoordinate();
   address.when(success: (adr) async {
     print(adr);
+    // 관측소 정보
+    String depth1 = adr.region1depthName ?? '';
+    String depth2 = adr.region2depthName ?? '';
+    var observatory =
+        await repository.getObservatoryWithAddress(depth1, depth2);
+    observatory.when(success: (info) async {
+      print(info);
+      // 자외선 지수
+      var uvRays = await repository.getUVRays('${info.code}');
+      uvRays.when(success: (info) {
+        print(info);
+      }, error: (e) {
+        print(e);
+      });
+    }, error: (e) {
+      print(e);
+    });
+
+    // 미세먼지
+    String query =
+    adr.region2depthName != null ? adr.region2depthName! : '';
+    var dnsty = await repository.getMesureDnsty(false, query);
+    dnsty.when(success: (info) {
+      print(info);
+    }, error: (e) {
+      print(e);
+    });
+
+    // 출몰
+    double longitude = adr.x ?? 0;
+    double latitude = adr.y ?? 0;
+    var riseSet = await repository.getRiseSetWithCoordinate(longitude, latitude);
+    riseSet.when(success: (info) {
+      print(info);
+    }, error: (e) {
+      print(e);
+    });
   }, error: (e) {
     print(e);
   });
 
-  // 출몰
-  var riseSet = await repository.getRiseSetWithCoordinate();
-  riseSet.when(success: (info) {
-    print(info);
-  }, error: (e) {
-    print(e);
-  });
-
-  // 미세먼지
-  var dnsty = await repository.getMesureDnsty(false);
-  dnsty.when(success: (info) {
-    print(info);
+  // 예보 (4일  80시간) * 오늘 내일정보
+  // 3시간 단위 업데이트
+  // 강수확률 평균, 하늘상태, 최고 최저 기온
+  var vilageFcst = await repository.getVilageFast(false);
+  vilageFcst.when(success: (info) {
+    for (Fcst fcst in info) {
+      print(fcst);
+    }
   }, error: (e) {
     print(e);
   });
@@ -68,18 +105,6 @@ void main() async {
   // 예보 (6시간) * 제거
   /*var ultraFcst = await repository.getUltraStrFcst(false);
   ultraFcst.when(success: (info) {
-    for (Fcst fcst in info) {
-      print(fcst);
-    }
-  }, error: (e) {
-    print(e);
-  });*/
-
-  // 예보 (4일  80시간) * 오늘 내일정보
-  // 3시간 단위 업데이트
-  // 강수확률 평균, 하늘상태, 최고 최저 기온
-  /*var vilageFcst = await repository.getVilageFast(false);
-  vilageFcst.when(success: (info) {
     for (Fcst fcst in info) {
       print(fcst);
     }

@@ -94,4 +94,18 @@ class RemoteApi {
     });
     return await http.get(url);
   }
+
+  // 자외선 지수 조회
+  Future<http.Response> getUVRays(String time, String areaNo) async {
+    var url =
+    Uri.https(baseUrl, '/1360000/LivingWthrIdxServiceV4/getUVIdxV4', {
+      'serviceKey': serviceKey ?? '',
+      'dataType': 'JSON',
+      'numOfRows': '10',
+      'pageNo': '1',
+      'time': time,
+      'areaNo': areaNo,
+    });
+    return await http.get(url);
+  }
 }

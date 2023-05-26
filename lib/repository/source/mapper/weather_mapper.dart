@@ -1,10 +1,13 @@
+import 'package:sweater/repository/source/local/entity/observatory_entity.dart';
 import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
+import 'package:sweater/repository/source/local/entity/uv_rays_entity.dart';
 import 'package:sweater/repository/source/remote/dto/observatory_dto.dart';
 import 'package:sweater/repository/source/remote/model/address.dart';
 import 'package:sweater/repository/source/remote/model/dnsty.dart';
 import 'package:sweater/repository/source/remote/model/fcst.dart';
 import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
+import 'package:sweater/repository/source/remote/model/uv_rays.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/local/entity/address_entity.dart';
 import 'package:sweater/repository/source/local/entity/dnsty_entity.dart';
@@ -13,6 +16,7 @@ import 'package:sweater/repository/source/local/entity/ncst_entity.dart';
 
 import '../remote/model/rise_set.dart';
 
+// 날씨 실황
 extension ToNcst on NcstEntity {
   Ncst toNcst() {
     var ncst = Ncst(
@@ -28,7 +32,6 @@ extension ToNcst on NcstEntity {
     return ncst;
   }
 }
-
 extension ToNcstEntity on Ncst {
   NcstEntity toNcstEntity() {
     var entity =
@@ -44,6 +47,7 @@ extension ToNcstEntity on Ncst {
   }
 }
 
+// 날씨 예보
 extension ToFcst on FcstEntity {
   Fcst toFcst() {
     var fcst = Fcst(
@@ -61,7 +65,6 @@ extension ToFcst on FcstEntity {
     return fcst;
   }
 }
-
 extension ToFcstEntity on Fcst {
   FcstEntity toFcstEntity() {
     var entity =
@@ -79,6 +82,7 @@ extension ToFcstEntity on Fcst {
   }
 }
 
+// 미세먼지
 extension ToDnsty on DnstyEntity {
   Dnsty toDnsty() {
     var dnsty = Dnsty();
@@ -106,7 +110,6 @@ extension ToDnsty on DnstyEntity {
     return dnsty;
   }
 }
-
 extension ToDnstyEntity on Dnsty {
   DnstyEntity toDnstyEntity() {
     var dnstyEntity = DnstyEntity();
@@ -135,6 +138,7 @@ extension ToDnstyEntity on Dnsty {
   }
 }
 
+// 주소
 extension ToAddressEntity on Address {
   AddressEntity toAddressEntity() {
     var entity = AddressEntity();
@@ -150,7 +154,6 @@ extension ToAddressEntity on Address {
     return entity;
   }
 }
-
 extension ToAddress on AddressEntity {
   Address toAddress() {
     var address = Address(
@@ -168,6 +171,7 @@ extension ToAddress on AddressEntity {
   }
 }
 
+// 출몰
 extension ToRiseSetEntity on RiseSet {
   RiseSetEntity toRiseSetEntity() {
     var entity = RiseSetEntity();
@@ -182,7 +186,6 @@ extension ToRiseSetEntity on RiseSet {
     return entity;
   }
 }
-
 extension ToRiseSet on RiseSetEntity {
   RiseSet toRiseSet() {
     var address = RiseSet(
@@ -199,6 +202,7 @@ extension ToRiseSet on RiseSetEntity {
   }
 }
 
+// 관측소
 extension ToObservatory on ObservatoryDto {
   Observatory toObservatory() {
     //print(code);
@@ -218,5 +222,85 @@ extension ToObservatory on ObservatoryDto {
       longitude: longitude,
       latitude: latitude,
     );
+  }
+}
+extension ToObservatoryEntity on Observatory {
+  ObservatoryEntity toObservatoryEntity() {
+    var entity = ObservatoryEntity();
+    entity.code = code;
+    entity.depth1 = depth1;
+    entity.depth2 = depth2;
+    entity.depth3 = depth3;
+    entity.gridX = gridX;
+    entity.gridY = gridY;
+    entity.lonHour = lonHour;
+    entity.lonMin = lonMin;
+    entity.lonSec = lonSec;
+    entity.latHour = latHour;
+    entity.latMin = latMin;
+    entity.latSec = latSec;
+    entity.longitude = longitude;
+    entity.latitude = latitude;
+    return entity;
+  }
+}
+extension ToObservatoryFromEntity on ObservatoryEntity {
+  Observatory toObservatory() {
+    //print(code);
+    return Observatory(
+      code: code,
+      depth1: depth1,
+      depth2: depth2,
+      depth3: depth3,
+      gridX: gridX,
+      gridY: gridY,
+      lonHour: lonHour,
+      lonMin: lonMin,
+      lonSec: lonSec,
+      latHour: latHour,
+      latMin: latMin,
+      latSec: latSec,
+      longitude: longitude,
+      latitude: latitude,
+    );
+  }
+}
+
+// 자외선
+extension ToUVRaysEntity on UVRays {
+  UVRaysEntity toUVRaysEntity() {
+    var entity = UVRaysEntity();
+    entity.code = code;
+    entity.areaNo = areaNo;
+    entity.date = date;
+    entity.h0 = h0;
+    entity.h3 = h3;
+    entity.h6 = h6;
+    entity.h9 = h9;
+    entity.h12 = h12;
+    entity.h15 = h15;
+    entity.h18 = h18;
+    entity.h21 = h21;
+    entity.h24 = h24;
+    return entity;
+  }
+}
+extension ToUVRays on UVRaysEntity {
+  UVRays toUVRays() {
+    var uvRays = UVRays(
+      code: code,
+      areaNo: areaNo,
+      date: date,
+      h0: h0,
+      h3: h3,
+      h6: h6,
+      h9: h9,
+      h12: h12,
+      h15: h15,
+      h18: h18,
+      h21: h21,
+      h24: h24,
+    );
+    return uvRays;
   }
 }

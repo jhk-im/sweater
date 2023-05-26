@@ -1,22 +1,15 @@
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:csv/csv.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sweater/repository/source/csv/observatory_parser.dart';
-import 'package:sweater/repository/source/remote/dto/observatory_dto.dart';
 import 'package:sweater/repository/source/remote/model/address.dart';
-import 'package:sweater/repository/source/remote/model/adress_list.dart';
 import 'package:sweater/repository/source/remote/model/dnsty.dart';
-import 'package:sweater/repository/source/remote/model/dnsty_list.dart';
 import 'package:sweater/repository/source/remote/model/fcst.dart';
-import 'package:sweater/repository/source/remote/model/fcst_list.dart';
 import 'package:sweater/repository/source/remote/model/ncst.dart';
-import 'package:sweater/repository/source/remote/model/ncst_list.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
 import 'package:sweater/repository/source/remote/model/rise_set.dart';
+import 'package:sweater/repository/source/remote/model/uv_rays.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/mapper/weather_mapper.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
@@ -94,8 +87,98 @@ class WeatherRepository {
     }
   }
 
-  // 현재 좌표 출몰 조회
-  Future<Result<RiseSet>> getRiseSetWithCoordinate() async {
+  // 관측소 정보 조회
+  Future<Result<Observatory>> getObservatoryWithAddress(String depth1, String depth2) async {
+    final localList = await _dao.getAllObservatoryList();
+    List<Observatory> list = [];
+    Observatory result = Observatory();
+    if (localList.isNotEmpty) {
+      print('getObservatoryWithAddress() -> local return');
+      list = localList.map((e) => e.toObservatory()).toList();
+    } else {
+      print('getObservatoryWithAddress() -> csv return');
+      var csv = await rootBundle.loadString(
+        "assets/data/observatory.csv",
+      );
+      list = await _observatoryParser.parse(csv);
+      _dao.clearObservatory();
+      _dao.insertObservatoryList(list.map((e) => e.toObservatoryEntity()).toList());
+    }
+
+    var d1 = list.where((e) => e.depth1 == depth1 && e.depth2 == depth2);
+    if (d1.isNotEmpty) {
+      result = d1.toList()[0];
+    } else {
+      var d2 = list.where((e) => e.depth1 == depth1 && e.depth2 == '');
+      if (d2.isNotEmpty) {
+        result = d2.toList()[0];
+      } else {
+        var d3 = list.where((e) => e.depth1 == '서울특별시');
+        if (d3.isNotEmpty) {
+          result = d3.toList()[0];
+        }
+      }
+    }
+
+    if (result.depth1 != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getObservatoryWithAddress failed: not found'));
+    }
+  }
+
+  // 자외선 지수 조회
+  Future<Result<UVRays>> getUVRays(String areaNo) async {
+    final localList = await _dao.getAllUVRaysList();
+
+    // 현재시간
+    String dt = DateTime.now()
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String time = dt.substring(0, 10);
+
+    if (localList.isNotEmpty) {
+      if (localList[0].date == time) {
+        print('getUVRays() -> local return');
+        return Result.success(localList[0].toUVRays());
+      }
+    }
+
+    // remote
+    UVRays result = UVRays();
+    try {
+      final response = await _api.getUVRays(time, areaNo);
+      final jsonResult = jsonDecode(response.body);
+      UVRaysList list = UVRaysList.fromJson(jsonResult['response']['body']);
+      if (list.items != null) {
+        if (list.items!.item != null) {
+          result = list.items!.item![0];
+          // 로컬 업데이트
+          if (result.code != null) {
+            _dao.clearUVRaysList();
+            for (UVRays uv in list.items!.item!) {
+              uv.date = time;
+            }
+            _dao.insertUVRaysList(
+                list.items!.item!.map((e) => e.toUVRaysEntity()).toList());
+          }
+        }
+      }
+      print('getUVRays() -> api return');
+    } catch (e) {
+      return Result.error(Exception('getUVRays failed: ${e.toString()}'));
+    }
+
+    if (result.code != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getUVRays failed: not found'));
+    }
+  }
+
+  // 좌표 출몰 조회
+  Future<Result<RiseSet>> getRiseSetWithCoordinate(double longitude, double latitude) async {
     final localList = await _dao.getAllRiseSet();
     String dateTime = DateTime.now()
         .toString()
@@ -109,12 +192,10 @@ class WeatherRepository {
       return Result.success(localList[0].toRiseSet());
     }
 
-    Position position = await locationRepository.getLocation();
-
     // remote
     try {
       final response = await _api.getRiseSetInfoWithCoordinate(
-          currentDate, position.longitude, position.latitude);
+          currentDate, longitude, latitude);
 
       final xmlResult = XmlDocument.parse(utf8.decode(response.bodyBytes))
           .findAllElements('item');
@@ -138,8 +219,8 @@ class WeatherRepository {
     }
   }
 
-  // 측정소별 미세먼지
-  Future<Result<List<Dnsty>>> getMesureDnsty(bool isRemote) async {
+  // 측정소별 미세먼지 조회
+  Future<Result<List<Dnsty>>> getMesureDnsty(bool isRemote, String query) async {
     final localList = await _dao.getAllMesureDnstyList();
 
     // local
@@ -166,10 +247,6 @@ class WeatherRepository {
       }
     }
 
-    final address = await _dao.getAllAddressList();
-    String query =
-        address[0].region2depthName != null ? address[0].region2depthName! : '';
-
     // remote
     try {
       final response = await _api.getMsrstnAcctoRltmMesureDnsty(query);
@@ -193,6 +270,78 @@ class WeatherRepository {
       return Result.error(Exception('getMesureDnsty failed: ${e.toString()}'));
     }
   }
+
+
+
+  // 단기 예보
+  Future<Result<List<Fcst>>> getVilageFast(bool isRemote) async {
+    final localList = await _dao.getAllVillageFcstList();
+
+    // 30분 전
+    DateTime dateTime = DateTime.now();
+    String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
+        dateTime.hour, dateTime.minute - 30)
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String date = dt.substring(0, 8);
+    String checkTime = dt.substring(8, 10);
+    int checkTimeIndex = int.parse(checkTime);
+    String time = baseTimeList[checkTimeIndex];
+
+    // local
+    if (!isRemote && localList.isNotEmpty) {
+      if (localList[0].baseTime != null) {
+        String localTime = localList[0].baseTime!.substring(0, 2);
+        String callTime = time.substring(0, 2);
+        String localDate = localList[0].baseDate ?? '';
+        if (date == localDate) {
+          if (callTime == localTime) {
+            print('getVilageFast() -> local return');
+            return Result.success(localList.map((e) => e.toFcst()).toList());
+          }
+        }
+      }
+    }
+
+    // get location
+    Position position = await locationRepository.getLocation();
+    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
+    int x = gpsToData['x'];
+    int y = gpsToData['y'];
+
+    // remote
+    try {
+      final response = await _api.getVilageFcst(date, time, x, y);
+      final jsonResult = jsonDecode(response.body);
+      FcstList list = FcstList.fromJson(jsonResult['response']['body']);
+      List<Fcst> result = [];
+      if (list.items?.item != null) {
+        for (var item in list.items!.item!) {
+          item.weatherCategory = await getWeatherCode(item.category ?? '');
+          result.add(item);
+        }
+      }
+      // local update
+      if (result.isNotEmpty) {
+        _dao.clearVilageFcstList();
+        _dao.insertVilageFcstList(result.map((e) => e.toFcstEntity()).toList());
+      }
+      print('getVilageFast() -> api return');
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(Exception('getVilageFast failed: ${e.toString()}'));
+    }
+  }
+
+  // 날씨 category 에 따른 정보 가져오기
+  Future<WeatherCategory> getWeatherCode(String category) async {
+    final jsonString = await rootBundle.loadString('assets/data/code.json');
+    final jsonObject = jsonDecode(jsonString);
+    return WeatherCategory.fromJson(jsonObject[category]);
+  }
+
+
 
   // 초단기 실황
   Future<Result<List<Ncst>>> getUltraStrNcst(bool isRemote) async {
@@ -311,80 +460,5 @@ class WeatherRepository {
     } catch (e) {
       return Result.error(Exception('getUltraStrFcst failed: ${e.toString()}'));
     }
-  }
-
-  // 단기 예보
-  Future<Result<List<Fcst>>> getVilageFast(bool isRemote) async {
-    final localList = await _dao.getAllVillageFcstList();
-
-    // 30분 전
-    DateTime dateTime = DateTime.now();
-    String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-            dateTime.hour, dateTime.minute - 30)
-        .toString()
-        .replaceAll(RegExp("[^0-9\\s]"), "")
-        .replaceAll(" ", "");
-    String date = dt.substring(0, 8);
-    String checkTime = dt.substring(8, 10);
-    int checkTimeIndex = int.parse(checkTime);
-    String time = baseTimeList[checkTimeIndex];
-
-    // local
-    if (!isRemote && localList.isNotEmpty) {
-      if (localList[0].baseTime != null) {
-        String localTime = localList[0].baseTime!.substring(0, 2);
-        String callTime = time.substring(0, 2);
-        String localDate = localList[0].baseDate ?? '';
-        if (date == localDate) {
-          if (callTime == localTime) {
-            print('getVilageFast() -> local return');
-            return Result.success(localList.map((e) => e.toFcst()).toList());
-          }
-        }
-      }
-    }
-
-    // get location
-    Position position = await locationRepository.getLocation();
-    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
-    int x = gpsToData['x'];
-    int y = gpsToData['y'];
-
-    // remote
-    try {
-      final response = await _api.getVilageFcst(date, time, x, y);
-      final jsonResult = jsonDecode(response.body);
-      FcstList list = FcstList.fromJson(jsonResult['response']['body']);
-      List<Fcst> result = [];
-      if (list.items?.item != null) {
-        for (var item in list.items!.item!) {
-          item.weatherCategory = await getWeatherCode(item.category ?? '');
-          result.add(item);
-        }
-      }
-      // local update
-      if (result.isNotEmpty) {
-        _dao.clearVilageFcstList();
-        _dao.insertVilageFcstList(result.map((e) => e.toFcstEntity()).toList());
-      }
-      print('getVilageFast() -> api return');
-      return Result.success(result);
-    } catch (e) {
-      return Result.error(Exception('getVilageFast failed: ${e.toString()}'));
-    }
-  }
-
-  // 날씨 category 에 따른 정보 가져오기
-  Future<WeatherCategory> getWeatherCode(String category) async {
-    final jsonString = await rootBundle.loadString('assets/data/code.json');
-    final jsonObject = jsonDecode(jsonString);
-    return WeatherCategory.fromJson(jsonObject[category]);
-  }
-
-  Future<List<Observatory>> getObservatory() async {
-    var csv = await rootBundle.loadString(
-      "assets/data/observatory_data.csv",
-    );
-    return await _observatoryParser.parse(csv);
   }
 }
