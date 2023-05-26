@@ -42,6 +42,7 @@ flutter:
     - assets/.env
     - assets/data/code.json
     - assets/data/observatory.csv
+    - assets/data/mid_code.csv
 
   # fonts:
   #   - family: Schyler

@@ -1,10 +1,17 @@
+import 'package:sweater/repository/source/local/entity/mid_code_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_ta_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_land_fcst_entity.dart';
 import 'package:sweater/repository/source/local/entity/observatory_entity.dart';
 import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
 import 'package:sweater/repository/source/local/entity/uv_rays_entity.dart';
+import 'package:sweater/repository/source/remote/dto/mid_code_dto.dart';
 import 'package:sweater/repository/source/remote/dto/observatory_dto.dart';
 import 'package:sweater/repository/source/remote/model/address.dart';
 import 'package:sweater/repository/source/remote/model/dnsty.dart';
 import 'package:sweater/repository/source/remote/model/fcst.dart';
+import 'package:sweater/repository/source/remote/model/mid_code.dart';
+import 'package:sweater/repository/source/remote/model/mid_land_fcst.dart';
+import 'package:sweater/repository/source/remote/model/mid_ta.dart';
 import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
 import 'package:sweater/repository/source/remote/model/uv_rays.dart';
@@ -32,6 +39,7 @@ extension ToNcst on NcstEntity {
     return ncst;
   }
 }
+
 extension ToNcstEntity on Ncst {
   NcstEntity toNcstEntity() {
     var entity =
@@ -65,6 +73,7 @@ extension ToFcst on FcstEntity {
     return fcst;
   }
 }
+
 extension ToFcstEntity on Fcst {
   FcstEntity toFcstEntity() {
     var entity =
@@ -110,6 +119,7 @@ extension ToDnsty on DnstyEntity {
     return dnsty;
   }
 }
+
 extension ToDnstyEntity on Dnsty {
   DnstyEntity toDnstyEntity() {
     var dnstyEntity = DnstyEntity();
@@ -154,6 +164,7 @@ extension ToAddressEntity on Address {
     return entity;
   }
 }
+
 extension ToAddress on AddressEntity {
   Address toAddress() {
     var address = Address(
@@ -186,6 +197,7 @@ extension ToRiseSetEntity on RiseSet {
     return entity;
   }
 }
+
 extension ToRiseSet on RiseSetEntity {
   RiseSet toRiseSet() {
     var address = RiseSet(
@@ -224,6 +236,7 @@ extension ToObservatory on ObservatoryDto {
     );
   }
 }
+
 extension ToObservatoryEntity on Observatory {
   ObservatoryEntity toObservatoryEntity() {
     var entity = ObservatoryEntity();
@@ -244,6 +257,7 @@ extension ToObservatoryEntity on Observatory {
     return entity;
   }
 }
+
 extension ToObservatoryFromEntity on ObservatoryEntity {
   Observatory toObservatory() {
     //print(code);
@@ -285,6 +299,7 @@ extension ToUVRaysEntity on UVRays {
     return entity;
   }
 }
+
 extension ToUVRays on UVRaysEntity {
   UVRays toUVRays() {
     var uvRays = UVRays(
@@ -302,5 +317,219 @@ extension ToUVRays on UVRaysEntity {
       h24: h24,
     );
     return uvRays;
+  }
+}
+
+// 중기 예보
+extension ToMidCode on MidCodeDto {
+  MidCode toMidCode() {
+    return MidCode(
+      city: city,
+      code: code,
+    );
+  }
+}
+
+extension ToMidCodeEntity on MidCode {
+  MidCodeEntity toMidCodeEntity() {
+    var entity = MidCodeEntity();
+    entity.city = city;
+    entity.code = code;
+    return entity;
+  }
+}
+
+extension ToMidCodeFromEntity on MidCodeEntity {
+  MidCode toMidCode() {
+    return MidCode(
+      city: city,
+      code: code,
+    );
+  }
+}
+
+extension ToMidTaEntity on MidTa {
+  MidTaEntity toMidTaEntity() {
+    var entity = MidTaEntity();
+    entity.regId = regId;
+    entity.taMin3 = taMin3;
+    entity.taMin3Low = taMin3Low;
+    entity.taMin3High = taMin3High;
+    entity.taMax3 = taMax3;
+    entity.taMax3Low = taMax3Low;
+    entity.taMax3High = taMax3High;
+    entity.taMin4 = taMin4;
+    entity.taMin4Low = taMin4Low;
+    entity.taMin4High = taMin4High;
+    entity.taMax4 = taMax4;
+    entity.taMax4Low = taMax4Low;
+    entity.taMax4High = taMax4High;
+    entity.taMin5 = taMin5;
+    entity.taMin5Low = taMin5Low;
+    entity.taMin5High = taMin5High;
+    entity.taMax5 = taMax5;
+    entity.taMax5Low = taMax5Low;
+    entity.taMax5High = taMax5High;
+    entity.taMin6 = taMin6;
+    entity.taMin6Low = taMin6Low;
+    entity.taMin6High = taMin6High;
+    entity.taMax6 = taMax6;
+    entity.taMax6Low = taMax6Low;
+    entity.taMax6High = taMax6High;
+    entity.taMin7 = taMin7;
+    entity.taMin7Low = taMin7Low;
+    entity.taMin7High = taMin7High;
+    entity.taMax7 = taMax7;
+    entity.taMax7Low = taMax7Low;
+    entity.taMax7High = taMax7High;
+    entity.taMin8 = taMin8;
+    entity.taMin8Low = taMin8Low;
+    entity.taMin8High = taMin8High;
+    entity.taMax8 = taMax8;
+    entity.taMax8Low = taMax8Low;
+    entity.taMax8High = taMax8High;
+    entity.taMin9 = taMin9;
+    entity.taMin9Low = taMin9Low;
+    entity.taMin9High = taMin9High;
+    entity.taMax9 = taMax9;
+    entity.taMax9Low = taMax9Low;
+    entity.taMax9High = taMax9High;
+    entity.taMin10 = taMin10;
+    entity.taMin10Low = taMin10Low;
+    entity.taMin10High = taMin10High;
+    entity.taMax10 = taMax10;
+    entity.taMax10Low = taMax10Low;
+    entity.taMax10High = taMax10High;
+    entity.date = date;
+    return entity;
+  }
+}
+
+extension ToMidTa on MidTaEntity {
+  MidTa toMidTa() {
+    MidTa midTa = MidTa(
+      regId: regId,
+      taMin3: taMin3,
+      taMin3Low: taMin3Low,
+      taMin3High: taMin3High,
+      taMax3: taMax3,
+      taMax3Low: taMax3Low,
+      taMax3High: taMax3High,
+      taMin4: taMin4,
+      taMin4Low: taMin4Low,
+      taMin4High: taMin4High,
+      taMax4: taMax4,
+      taMax4Low: taMax4Low,
+      taMax4High: taMax4High,
+      taMin5: taMin5,
+      taMin5Low: taMin5Low,
+      taMin5High: taMin5High,
+      taMax5: taMax5,
+      taMax5Low: taMax5Low,
+      taMax5High: taMax5High,
+      taMin6: taMin6,
+      taMin6Low: taMin6Low,
+      taMin6High: taMin6High,
+      taMax6: taMax6,
+      taMax6Low: taMax6Low,
+      taMax6High: taMax6High,
+      taMin7: taMin7,
+      taMin7Low: taMin7Low,
+      taMin7High: taMin7High,
+      taMax7: taMax7,
+      taMax7Low: taMax7Low,
+      taMax7High: taMax7High,
+      taMin8: taMin8,
+      taMin8Low: taMin8Low,
+      taMin8High: taMin8High,
+      taMax8: taMax8,
+      taMax8Low: taMax8Low,
+      taMax8High: taMax8High,
+      taMin9: taMin9,
+      taMin9Low: taMin9Low,
+      taMin9High: taMin9High,
+      taMax9: taMax9,
+      taMax9Low: taMax9Low,
+      taMax9High: taMax9High,
+      taMin10: taMin10,
+      taMin10Low: taMin10Low,
+      taMin10High: taMin10High,
+      taMax10: taMax10,
+      taMax10Low: taMax10Low,
+      taMax10High: taMax10High,
+    );
+    midTa.date = date;
+    return midTa;
+  }
+}
+
+extension ToMidLandFcstEntity on MidLandFcst {
+  MidLandFcstEntity toMidLandFcstEntity() {
+    var entity = MidLandFcstEntity();
+    entity.regId = regId;
+    entity.rnSt3Am = rnSt3Am;
+    entity.rnSt3Pm = rnSt3Pm;
+    entity.rnSt4Am = rnSt4Am;
+    entity.rnSt4Pm = rnSt4Pm;
+    entity.rnSt5Am = rnSt5Am;
+    entity.rnSt5Pm = rnSt5Pm;
+    entity.rnSt6Am = rnSt6Am;
+    entity.rnSt6Pm = rnSt6Pm;
+    entity.rnSt7Am = rnSt7Am;
+    entity.rnSt7Pm = rnSt7Pm;
+    entity.rnSt8 = rnSt8;
+    entity.rnSt9 = rnSt9;
+    entity.rnSt10 = rnSt10;
+    entity.wf3Am = wf3Am;
+    entity.wf3Pm = wf3Pm;
+    entity.wf4Am = wf4Am;
+    entity.wf4Pm = wf4Pm;
+    entity.wf5Am = wf5Am;
+    entity.wf5Pm = wf5Pm;
+    entity.wf6Am = wf6Am;
+    entity.wf6Pm = wf6Pm;
+    entity.wf7Am = wf7Am;
+    entity.wf7Pm = wf7Pm;
+    entity.wf8 = wf8;
+    entity.wf9 = wf9;
+    entity.wf10 = wf10;
+    entity.date = date;
+    return entity;
+  }
+}
+
+extension ToMidLandFcst on MidLandFcstEntity {
+  MidLandFcst toMidLandFcst() {
+    MidLandFcst midLandFcst = MidLandFcst(
+      regId: regId,
+      rnSt3Am: rnSt3Am,
+      rnSt3Pm: rnSt3Pm,
+      rnSt4Am: rnSt4Am,
+      rnSt4Pm: rnSt4Pm,
+      rnSt5Am: rnSt5Am,
+      rnSt5Pm: rnSt5Pm,
+      rnSt6Am: rnSt6Am,
+      rnSt6Pm: rnSt6Pm,
+      rnSt7Am: rnSt7Am,
+      rnSt7Pm: rnSt7Pm,
+      rnSt8: rnSt8,
+      rnSt9: rnSt9,
+      rnSt10: rnSt10,
+      wf3Am: wf3Am,
+      wf3Pm: wf3Pm,
+      wf4Am: wf4Am,
+      wf4Pm: wf4Pm,
+      wf5Am: wf5Am,
+      wf5Pm: wf5Pm,
+      wf6Am: wf6Am,
+      wf6Pm: wf6Pm,
+      wf7Am: wf7Am,
+      wf7Pm: wf7Pm,
+      wf8: wf8,
+      wf9: wf9,
+      wf10: wf10,
+    );
+    midLandFcst.date = date;
+    return midLandFcst;
   }
 }

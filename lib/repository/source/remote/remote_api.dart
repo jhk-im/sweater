@@ -20,54 +20,6 @@ class RemoteApi {
     return await http.get(url, headers: headers);
   }
 
-  // 초단기 실황
-  Future<http.Response> getUltraStrNcst(String date, String time, int x, int y) async {
-    var url =
-    Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst', {
-      'dataType': 'JSON',
-      'serviceKey': serviceKey ?? '',
-      'numOfRows': '10',
-      'pageNo': '1',
-      'base_date': date,
-      'base_time': time,
-      'nx': '$x',
-      'ny': '$y',
-    });
-    return await http.get(url);
-  }
-
-  // 초단기 예보
-  Future<http.Response> getUltraStrFcst(String date, String time, int x, int y) async {
-    var url =
-    Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst', {
-      'dataType': 'JSON',
-      'serviceKey': serviceKey ?? '',
-      'numOfRows': '100',
-      'pageNo': '1',
-      'base_date': date,
-      'base_time': time,
-      'nx': '$x',
-      'ny': '$y',
-    });
-    return await http.get(url);
-  }
-
-  // 단기 예보
-  Future<http.Response> getVilageFcst(String date, String time, int x, int y) async {
-    var url =
-    Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getVilageFcst', {
-      'dataType': 'JSON',
-      'serviceKey': serviceKey ?? '',
-      'numOfRows': '60',
-      'pageNo': '1',
-      'base_date': date,
-      'base_time': time,
-      'nx': '$x',
-      'ny': '$y',
-    });
-    return await http.get(url);
-  }
-
   // 측정소별 실시간 대기오염 측정정보 조회
   Future<http.Response> getMsrstnAcctoRltmMesureDnsty(String sName) async {
     var url = Uri.https(baseUrl, '/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty', {
@@ -105,6 +57,85 @@ class RemoteApi {
       'pageNo': '1',
       'time': time,
       'areaNo': areaNo,
+    });
+    return await http.get(url);
+  }
+
+  // 중기 기온 예보
+  Future<http.Response> getMidTa(String tmFc, String regId) async {
+    var url =
+    Uri.https(baseUrl, '/1360000/MidFcstInfoService/getMidTa', {
+      'serviceKey': serviceKey ?? '',
+      'dataType': 'JSON',
+      'numOfRows': '10',
+      'pageNo': '1',
+      'tmFc': tmFc,
+      'regId': regId,
+    });
+    return await http.get(url);
+  }
+
+  // 중기 육상 예보
+  Future<http.Response> getMidLandFcst(String tmFc, String regId) async {
+    var url =
+    Uri.https(baseUrl, '1360000/MidFcstInfoService/getMidLandFcst', {
+      'serviceKey': serviceKey ?? '',
+      'dataType': 'JSON',
+      'numOfRows': '10',
+      'pageNo': '1',
+      'tmFc': tmFc,
+      'regId': regId,
+    });
+    return await http.get(url);
+  }
+
+  // 단기 예보
+  Future<http.Response> getVilageFcst(String date, String time, int x, int y) async {
+    var url =
+    Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getVilageFcst', {
+      'dataType': 'JSON',
+      'serviceKey': serviceKey ?? '',
+      'numOfRows': '60',
+      'pageNo': '1',
+      'base_date': date,
+      'base_time': time,
+      'nx': '$x',
+      'ny': '$y',
+    });
+    return await http.get(url);
+  }
+
+
+
+
+  // 초단기 실황
+  Future<http.Response> getUltraStrNcst(String date, String time, int x, int y) async {
+    var url =
+    Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst', {
+      'dataType': 'JSON',
+      'serviceKey': serviceKey ?? '',
+      'numOfRows': '10',
+      'pageNo': '1',
+      'base_date': date,
+      'base_time': time,
+      'nx': '$x',
+      'ny': '$y',
+    });
+    return await http.get(url);
+  }
+
+  // 초단기 예보
+  Future<http.Response> getUltraStrFcst(String date, String time, int x, int y) async {
+    var url =
+    Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst', {
+      'dataType': 'JSON',
+      'serviceKey': serviceKey ?? '',
+      'numOfRows': '100',
+      'pageNo': '1',
+      'base_date': date,
+      'base_time': time,
+      'nx': '$x',
+      'ny': '$y',
     });
     return await http.get(url);
   }

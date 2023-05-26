@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sweater/repository/source/local/entity/mid_code_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_land_fcst_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_ta_entity.dart';
 import 'package:sweater/repository/source/local/entity/observatory_entity.dart';
 import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
 import 'package:sweater/repository/source/local/entity/uv_rays_entity.dart';
-import 'package:sweater/repository/source/remote/model/fcst.dart';
-import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/local/entity/address_entity.dart';
 import 'package:sweater/repository/source/local/entity/dnsty_entity.dart';
 import 'package:sweater/repository/source/local/entity/fcst_entity.dart';
@@ -30,6 +31,9 @@ void main() async {
   Hive.registerAdapter(RiseSetEntityAdapter());
   Hive.registerAdapter(ObservatoryEntityAdapter());
   Hive.registerAdapter(UVRaysEntityAdapter());
+  Hive.registerAdapter(MidCodeEntityAdapter());
+  Hive.registerAdapter(MidTaEntityAdapter());
+  Hive.registerAdapter(MidLandFcstEntityAdapter());
 
   // repository
   final repository = WeatherRepository(RemoteApi(), WeatherDao());
@@ -53,6 +57,31 @@ void main() async {
       }, error: (e) {
         print(e);
       });
+    }, error: (e) {
+      print(e);
+    });
+
+    // 중기 기상 정보를 위한 코드 가져오기
+    var midCode = await repository.getMidCode(depth1, depth2);
+    midCode.when(success: (info) async {
+      print(info);
+      String regId = info.code ?? '';
+
+      // 중기 기온 예보
+      var midTa = await repository.getMidTa(regId);
+      midTa.when(success: (info) {
+        print(info);
+      }, error: (e) {
+        print(e);
+      });
+    }, error: (e) {
+      print(e);
+    });
+
+    // 중기 육상 예보
+    var midLandFcst = await repository.getMidLandFcst(depth1, depth2);
+    midLandFcst.when(success: (info) {
+      print(info);
     }, error: (e) {
       print(e);
     });
@@ -83,14 +112,14 @@ void main() async {
   // 예보 (4일  80시간) * 오늘 내일정보
   // 3시간 단위 업데이트
   // 강수확률 평균, 하늘상태, 최고 최저 기온
-  var vilageFcst = await repository.getVilageFast(false);
+  /*var vilageFcst = await repository.getVilageFast(false);
   vilageFcst.when(success: (info) {
     for (Fcst fcst in info) {
       print(fcst);
     }
   }, error: (e) {
     print(e);
-  });
+  });*/
 
   // 초단기 실황 * 오늘 정보 업데이트
   /*var ultraNcst = await repository.getUltraStrNcst(false);

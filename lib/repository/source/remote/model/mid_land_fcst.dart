@@ -26,6 +26,7 @@ class MidLandFcst {
   String? wf8;
   String? wf9;
   String? wf10;
+  String? date;
 
   MidLandFcst(
       {this.regId,
@@ -120,7 +121,7 @@ class MidLandFcst {
 
   @override
   String toString() {
-    return 'MidLandFcst: { regId: $regId,  rnSt3Am: $rnSt3Am, rnSt3Pm: $rnSt3Pm, wf3Am: $wf3Am, wf3Pm: $wf3Pm }';
+    return 'MidLandFcst: { regId: $regId,  rnSt3Am: $rnSt3Am, rnSt3Pm: $rnSt3Pm, wf3Am: $wf3Am, wf3Pm: $wf3Pm, date: $date }';
   }
 }
 

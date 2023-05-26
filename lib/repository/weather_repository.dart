@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:sweater/repository/source/csv/mid_code_parser.dart';
 import 'package:sweater/repository/source/csv/observatory_parser.dart';
 import 'package:sweater/repository/source/remote/model/address.dart';
 import 'package:sweater/repository/source/remote/model/dnsty.dart';
 import 'package:sweater/repository/source/remote/model/fcst.dart';
+import 'package:sweater/repository/source/remote/model/mid_code.dart';
+import 'package:sweater/repository/source/remote/model/mid_land_fcst.dart';
+import 'package:sweater/repository/source/remote/model/mid_ta.dart';
 import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
 import 'package:sweater/repository/source/remote/model/rise_set.dart';
@@ -23,6 +27,8 @@ import 'package:xml2json/xml2json.dart';
 class WeatherRepository {
   final RemoteApi _api;
   final WeatherDao _dao;
+  final _observatoryParser = ObservatoryParser();
+  final _midCodeParser = MidCodeParser();
   final List<String> baseTimeList = [
     '2300',
     '2300',
@@ -49,8 +55,61 @@ class WeatherRepository {
     '2000',
     '2000',
   ];
+  final Map<String, String> midFcstCode = {
+    '서울특별시, 인천광역시, 경기도': '11B00000',
+    '고성, 속초, 양양, 강릉, 동해, 삼척, 태백': '11D10000',
+    '강원도, 철원, 화천, 춘천, 양구, 인제, 홍천, 횡성, 평창, 정선, 영월': '11D20000',
+    '대전광역시, 세종특별자치시, 충청남도': '11C20000',
+    '충청북도': '11C10000',
+    '광주광역시, 전라남도': '11F20000',
+    '전라북도': '11F10000',
+    '대구광역시, 경상북도': '11H10000',
+    '부산광역시, 울산광역시 경상남도': '11H20000',
+    '제주도': '11G00000',
+  };
+  String _getMidFcstRegId(String depth1, String depth2) {
+    String regId = '11B00000';
+    for (String key in midFcstCode.keys) {
+      if (depth1 == '강원도' && depth2.isNotEmpty) {
+        if (key.contains(depth2.substring(0, 2))) {
+          regId = midFcstCode[key]!;
+          break;
+        }
+      } else {
+        if (key.contains(depth1)) {
+          regId = midFcstCode[key]!;
+          break;
+        }
+      }
+    }
+    return regId;
+  }
 
-  final _observatoryParser = ObservatoryParser();
+  String _getMidDate() {
+    String date = '';
+    // 30분전
+    DateTime dateTime = DateTime.now();
+    String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
+            dateTime.hour, dateTime.minute - 30)
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String current = dt.substring(0, 8);
+    int currentTime = int.parse(dt.substring(8, 10));
+    String prevDt = DateTime(dateTime.year, dateTime.month, dateTime.day - 1)
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String prev = prevDt.substring(0, 8);
+    if (currentTime < 6 || currentTime > 18) {
+      date = '${prev}1800';
+    } else if (currentTime > 6 && currentTime < 18) {
+      date = '${current}0600';
+    } else {
+      date = '${current}1800';
+    }
+    return date;
+  }
 
   LocationRepository locationRepository = LocationRepository();
 
@@ -88,7 +147,8 @@ class WeatherRepository {
   }
 
   // 관측소 정보 조회
-  Future<Result<Observatory>> getObservatoryWithAddress(String depth1, String depth2) async {
+  Future<Result<Observatory>> getObservatoryWithAddress(
+      String depth1, String depth2) async {
     final localList = await _dao.getAllObservatoryList();
     List<Observatory> list = [];
     Observatory result = Observatory();
@@ -102,7 +162,8 @@ class WeatherRepository {
       );
       list = await _observatoryParser.parse(csv);
       _dao.clearObservatory();
-      _dao.insertObservatoryList(list.map((e) => e.toObservatoryEntity()).toList());
+      _dao.insertObservatoryList(
+          list.map((e) => e.toObservatoryEntity()).toList());
     }
 
     var d1 = list.where((e) => e.depth1 == depth1 && e.depth2 == depth2);
@@ -123,7 +184,8 @@ class WeatherRepository {
     if (result.depth1 != null) {
       return Result.success(result);
     } else {
-      return Result.error(Exception('getObservatoryWithAddress failed: not found'));
+      return Result.error(
+          Exception('getObservatoryWithAddress failed: not found'));
     }
   }
 
@@ -178,7 +240,8 @@ class WeatherRepository {
   }
 
   // 좌표 출몰 조회
-  Future<Result<RiseSet>> getRiseSetWithCoordinate(double longitude, double latitude) async {
+  Future<Result<RiseSet>> getRiseSetWithCoordinate(
+      double longitude, double latitude) async {
     final localList = await _dao.getAllRiseSet();
     String dateTime = DateTime.now()
         .toString()
@@ -220,7 +283,8 @@ class WeatherRepository {
   }
 
   // 측정소별 미세먼지 조회
-  Future<Result<List<Dnsty>>> getMesureDnsty(bool isRemote, String query) async {
+  Future<Result<List<Dnsty>>> getMesureDnsty(
+      bool isRemote, String query) async {
     final localList = await _dao.getAllMesureDnstyList();
 
     // local
@@ -271,7 +335,133 @@ class WeatherRepository {
     }
   }
 
+  // 중기 지역별 코드 조회
+  Future<Result<MidCode>> getMidCode(String depth1, String depth2) async {
+    final localList = await _dao.getAllMidCodeList();
+    List<MidCode> list = [];
+    MidCode result = MidCode();
+    if (localList.isNotEmpty) {
+      print('getMidCode() -> local return');
+      list = localList.map((e) => e.toMidCode()).toList();
+    } else {
+      print('getMidCode() -> csv return');
+      var csv = await rootBundle.loadString(
+        "assets/data/mid_code.csv",
+      );
+      list = await _midCodeParser.parse(csv);
+      _dao.clearMidCodeList();
+      _dao.insertMidCodeList(list.map((e) => e.toMidCodeEntity()).toList());
+    }
 
+    var d1 = list.where((e) => e.city == depth2);
+    if (d1.isNotEmpty) {
+      result = d1.toList()[0];
+    } else {
+      var d2 = list.where((e) => e.city == depth1);
+      if (d2.isNotEmpty) {
+        result = d2.toList()[0];
+      } else {
+        var d3 = list.where((e) => e.city == '서울특별시');
+        if (d3.isNotEmpty) {
+          result = d3.toList()[0];
+        }
+      }
+    }
+
+    if (result.city != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getMidCode failed: not found'));
+    }
+  }
+
+  // 중기 기온 예보
+  Future<Result<MidTa>> getMidTa(String regId) async {
+    final localList = await _dao.getAllMidTaList();
+    MidTa result = MidTa();
+    String tmFc = _getMidDate();
+
+    if (localList.isNotEmpty) {
+      if (tmFc == localList[0].date) {
+        print('getMidTa() -> local return');
+        result = localList[0].toMidTa();
+      }
+    } else {
+      // remote
+      try {
+        final response = await _api.getMidTa(tmFc, regId);
+        final jsonResult = jsonDecode(response.body);
+        MidTaList list = MidTaList.fromJson(jsonResult['response']['body']);
+
+        if (list.items?.item != null) {
+          for (var item in list.items!.item!) {
+            item.date = tmFc;
+            result = item;
+          }
+        }
+        // 로컬 업데이트
+        if (result.regId != null) {
+          _dao.clearMidTaList();
+          _dao.insertMidTa(result.toMidTaEntity());
+        }
+        print('getMidTa() -> api return');
+      } catch (e) {
+        return Result.error(Exception('getMidTa failed: ${e.toString()}'));
+      }
+    }
+
+    if (result.regId != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getMidTa failed: not found'));
+    }
+  }
+
+  // 중기 육상 예보
+  Future<Result<MidLandFcst>> getMidLandFcst(
+      String depth1, String depth2) async {
+
+    final localList = await _dao.getAllMidLandFcstList();
+    String tmFc = _getMidDate();
+    String regId = _getMidFcstRegId(depth1, depth2);
+    MidLandFcst result = MidLandFcst();
+
+    if (localList.isNotEmpty) {
+      if (tmFc == localList[0].date) {
+        print('getMidLandFcst() -> local return');
+        result = localList[0].toMidLandFcst();
+      }
+    } else {
+      // remote
+      try {
+        final response = await _api.getMidLandFcst(tmFc, regId);
+        final jsonResult = jsonDecode(response.body);
+        MidLandFcstList list =
+        MidLandFcstList.fromJson(jsonResult['response']['body']);
+
+        if (list.items?.item != null) {
+          for (var item in list.items!.item!) {
+            item.date = tmFc;
+            result = item;
+          }
+        }
+        // local update
+        if (result.regId != null) {
+          _dao.clearMidLandFcstList();
+          _dao.insertMidLandFcst(result.toMidLandFcstEntity());
+        }
+        print('getMidLandFcst() -> api return');
+      } catch (e) {
+        return Result.error(Exception('getMidLandFcst failed: ${e.toString()}'));
+      }
+    }
+
+    if (result.regId != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getMidLandFcst failed: not found'));
+    }
+  }
 
   // 단기 예보
   Future<Result<List<Fcst>>> getVilageFast(bool isRemote) async {
@@ -280,7 +470,7 @@ class WeatherRepository {
     // 30분 전
     DateTime dateTime = DateTime.now();
     String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-        dateTime.hour, dateTime.minute - 30)
+            dateTime.hour, dateTime.minute - 30)
         .toString()
         .replaceAll(RegExp("[^0-9\\s]"), "")
         .replaceAll(" ", "");
@@ -340,8 +530,6 @@ class WeatherRepository {
     final jsonObject = jsonDecode(jsonString);
     return WeatherCategory.fromJson(jsonObject[category]);
   }
-
-
 
   // 초단기 실황
   Future<Result<List<Ncst>>> getUltraStrNcst(bool isRemote) async {
