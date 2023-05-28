@@ -90,12 +90,12 @@ class RemoteApi {
   }
 
   // 단기 예보
-  Future<http.Response> getVilageFcst(String date, String time, int x, int y) async {
+  Future<http.Response> getVilageFcst(String date, String time, int x, int y, bool isToday) async {
     var url =
     Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getVilageFcst', {
       'dataType': 'JSON',
       'serviceKey': serviceKey ?? '',
-      'numOfRows': '60',
+      'numOfRows': isToday ? '1000' : '300',
       'pageNo': '1',
       'base_date': date,
       'base_time': time,

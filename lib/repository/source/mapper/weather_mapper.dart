@@ -353,53 +353,23 @@ extension ToMidTaEntity on MidTa {
     var entity = MidTaEntity();
     entity.regId = regId;
     entity.taMin3 = taMin3;
-    entity.taMin3Low = taMin3Low;
-    entity.taMin3High = taMin3High;
     entity.taMax3 = taMax3;
-    entity.taMax3Low = taMax3Low;
-    entity.taMax3High = taMax3High;
+    entity.taMin3 = taMin3;
+    entity.taMax3 = taMax3;
     entity.taMin4 = taMin4;
-    entity.taMin4Low = taMin4Low;
-    entity.taMin4High = taMin4High;
     entity.taMax4 = taMax4;
-    entity.taMax4Low = taMax4Low;
-    entity.taMax4High = taMax4High;
     entity.taMin5 = taMin5;
-    entity.taMin5Low = taMin5Low;
-    entity.taMin5High = taMin5High;
     entity.taMax5 = taMax5;
-    entity.taMax5Low = taMax5Low;
-    entity.taMax5High = taMax5High;
     entity.taMin6 = taMin6;
-    entity.taMin6Low = taMin6Low;
-    entity.taMin6High = taMin6High;
     entity.taMax6 = taMax6;
-    entity.taMax6Low = taMax6Low;
-    entity.taMax6High = taMax6High;
     entity.taMin7 = taMin7;
-    entity.taMin7Low = taMin7Low;
-    entity.taMin7High = taMin7High;
     entity.taMax7 = taMax7;
-    entity.taMax7Low = taMax7Low;
-    entity.taMax7High = taMax7High;
     entity.taMin8 = taMin8;
-    entity.taMin8Low = taMin8Low;
-    entity.taMin8High = taMin8High;
     entity.taMax8 = taMax8;
-    entity.taMax8Low = taMax8Low;
-    entity.taMax8High = taMax8High;
     entity.taMin9 = taMin9;
-    entity.taMin9Low = taMin9Low;
-    entity.taMin9High = taMin9High;
     entity.taMax9 = taMax9;
-    entity.taMax9Low = taMax9Low;
-    entity.taMax9High = taMax9High;
     entity.taMin10 = taMin10;
-    entity.taMin10Low = taMin10Low;
-    entity.taMin10High = taMin10High;
     entity.taMax10 = taMax10;
-    entity.taMax10Low = taMax10Low;
-    entity.taMax10High = taMax10High;
     entity.date = date;
     return entity;
   }
@@ -410,53 +380,21 @@ extension ToMidTa on MidTaEntity {
     MidTa midTa = MidTa(
       regId: regId,
       taMin3: taMin3,
-      taMin3Low: taMin3Low,
-      taMin3High: taMin3High,
       taMax3: taMax3,
-      taMax3Low: taMax3Low,
-      taMax3High: taMax3High,
       taMin4: taMin4,
-      taMin4Low: taMin4Low,
-      taMin4High: taMin4High,
       taMax4: taMax4,
-      taMax4Low: taMax4Low,
-      taMax4High: taMax4High,
       taMin5: taMin5,
-      taMin5Low: taMin5Low,
-      taMin5High: taMin5High,
       taMax5: taMax5,
-      taMax5Low: taMax5Low,
-      taMax5High: taMax5High,
       taMin6: taMin6,
-      taMin6Low: taMin6Low,
-      taMin6High: taMin6High,
       taMax6: taMax6,
-      taMax6Low: taMax6Low,
-      taMax6High: taMax6High,
       taMin7: taMin7,
-      taMin7Low: taMin7Low,
-      taMin7High: taMin7High,
       taMax7: taMax7,
-      taMax7Low: taMax7Low,
-      taMax7High: taMax7High,
       taMin8: taMin8,
-      taMin8Low: taMin8Low,
-      taMin8High: taMin8High,
       taMax8: taMax8,
-      taMax8Low: taMax8Low,
-      taMax8High: taMax8High,
       taMin9: taMin9,
-      taMin9Low: taMin9Low,
-      taMin9High: taMin9High,
       taMax9: taMax9,
-      taMax9Low: taMax9Low,
-      taMax9High: taMax9High,
       taMin10: taMin10,
-      taMin10Low: taMin10Low,
-      taMin10High: taMin10High,
       taMax10: taMax10,
-      taMax10Low: taMax10Low,
-      taMax10High: taMax10High,
     );
     midTa.date = date;
     return midTa;

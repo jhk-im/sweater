@@ -10,7 +10,6 @@ import 'package:sweater/repository/source/remote/model/fcst.dart';
 import 'package:sweater/repository/source/remote/model/mid_code.dart';
 import 'package:sweater/repository/source/remote/model/mid_land_fcst.dart';
 import 'package:sweater/repository/source/remote/model/mid_ta.dart';
-import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
 import 'package:sweater/repository/source/remote/model/rise_set.dart';
 import 'package:sweater/repository/source/remote/model/uv_rays.dart';
@@ -29,6 +28,8 @@ class WeatherRepository {
   final WeatherDao _dao;
   final _observatoryParser = ObservatoryParser();
   final _midCodeParser = MidCodeParser();
+  final _locationRepository = LocationRepository();
+
   final List<String> baseTimeList = [
     '2300',
     '2300',
@@ -67,6 +68,7 @@ class WeatherRepository {
     '부산광역시, 울산광역시 경상남도': '11H20000',
     '제주도': '11G00000',
   };
+
   String _getMidFcstRegId(String depth1, String depth2) {
     String regId = '11B00000';
     for (String key in midFcstCode.keys) {
@@ -111,14 +113,12 @@ class WeatherRepository {
     return date;
   }
 
-  LocationRepository locationRepository = LocationRepository();
-
   WeatherRepository(this._api, this._dao);
 
   // 현재 좌표 주소 조회
   Future<Result<Address>> getAddressWithCoordinate() async {
     final localList = await _dao.getAllAddressList();
-    Position position = await locationRepository.getLocation();
+    Position position = await _locationRepository.getLocation();
 
     // 로컬에 있고 좌표값 변경이 없는 경우 로컬 리턴
     if (localList.isNotEmpty) {
@@ -239,7 +239,7 @@ class WeatherRepository {
     }
   }
 
-  // 좌표 출몰 조회
+  // 출몰 조회(좌표)
   Future<Result<RiseSet>> getRiseSetWithCoordinate(
       double longitude, double latitude) async {
     final localList = await _dao.getAllRiseSet();
@@ -290,10 +290,9 @@ class WeatherRepository {
     // local
     if (!isRemote && localList.isNotEmpty) {
       if (localList[0].dataTime != null) {
-        // 30분 전
         DateTime dateTime = DateTime.now();
         String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-                dateTime.hour, dateTime.minute - 30)
+                dateTime.hour, dateTime.minute)
             .toString()
             .replaceAll(RegExp("[^0-9\\s]"), "")
             .replaceAll(" ", "");
@@ -378,36 +377,36 @@ class WeatherRepository {
   // 중기 기온 예보
   Future<Result<MidTa>> getMidTa(String regId) async {
     final localList = await _dao.getAllMidTaList();
-    MidTa result = MidTa();
     String tmFc = _getMidDate();
 
     if (localList.isNotEmpty) {
       if (tmFc == localList[0].date) {
         print('getMidTa() -> local return');
-        result = localList[0].toMidTa();
+        return Result.success(localList[0].toMidTa());
       }
-    } else {
-      // remote
-      try {
-        final response = await _api.getMidTa(tmFc, regId);
-        final jsonResult = jsonDecode(response.body);
-        MidTaList list = MidTaList.fromJson(jsonResult['response']['body']);
+    }
 
-        if (list.items?.item != null) {
-          for (var item in list.items!.item!) {
-            item.date = tmFc;
-            result = item;
-          }
+    // remote
+    MidTa result = MidTa();
+    try {
+      final response = await _api.getMidTa(tmFc, regId);
+      final jsonResult = jsonDecode(response.body);
+      MidTaList list = MidTaList.fromJson(jsonResult['response']['body']);
+
+      if (list.items?.item != null) {
+        for (var item in list.items!.item!) {
+          item.date = tmFc;
+          result = item;
         }
-        // 로컬 업데이트
-        if (result.regId != null) {
-          _dao.clearMidTaList();
-          _dao.insertMidTa(result.toMidTaEntity());
-        }
-        print('getMidTa() -> api return');
-      } catch (e) {
-        return Result.error(Exception('getMidTa failed: ${e.toString()}'));
       }
+      // 로컬 업데이트
+      if (result.regId != null) {
+        _dao.clearMidTaList();
+        _dao.insertMidTa(result.toMidTaEntity());
+      }
+      print('getMidTa() -> api return');
+    } catch (e) {
+      return Result.error(Exception('getMidTa failed: ${e.toString()}'));
     }
 
     if (result.regId != null) {
@@ -424,36 +423,36 @@ class WeatherRepository {
     final localList = await _dao.getAllMidLandFcstList();
     String tmFc = _getMidDate();
     String regId = _getMidFcstRegId(depth1, depth2);
-    MidLandFcst result = MidLandFcst();
 
     if (localList.isNotEmpty) {
       if (tmFc == localList[0].date) {
         print('getMidLandFcst() -> local return');
-        result = localList[0].toMidLandFcst();
+        return Result.success(localList[0].toMidLandFcst());
       }
-    } else {
-      // remote
-      try {
-        final response = await _api.getMidLandFcst(tmFc, regId);
-        final jsonResult = jsonDecode(response.body);
-        MidLandFcstList list =
-        MidLandFcstList.fromJson(jsonResult['response']['body']);
+    }
 
-        if (list.items?.item != null) {
-          for (var item in list.items!.item!) {
-            item.date = tmFc;
-            result = item;
-          }
+    // remote
+    MidLandFcst result = MidLandFcst();
+    try {
+      final response = await _api.getMidLandFcst(tmFc, regId);
+      final jsonResult = jsonDecode(response.body);
+      MidLandFcstList list =
+      MidLandFcstList.fromJson(jsonResult['response']['body']);
+
+      if (list.items?.item != null) {
+        for (var item in list.items!.item!) {
+          item.date = tmFc;
+          result = item;
         }
-        // local update
-        if (result.regId != null) {
-          _dao.clearMidLandFcstList();
-          _dao.insertMidLandFcst(result.toMidLandFcstEntity());
-        }
-        print('getMidLandFcst() -> api return');
-      } catch (e) {
-        return Result.error(Exception('getMidLandFcst failed: ${e.toString()}'));
       }
+      // local update
+      if (result.regId != null) {
+        _dao.clearMidLandFcstList();
+        _dao.insertMidLandFcst(result.toMidLandFcstEntity());
+      }
+      print('getMidLandFcst() -> api return');
+    } catch (e) {
+      return Result.error(Exception('getMidLandFcst failed: ${e.toString()}'));
     }
 
     if (result.regId != null) {
@@ -463,13 +462,16 @@ class WeatherRepository {
     }
   }
 
-  // 단기 예보
-  Future<Result<List<Fcst>>> getVilageFast(bool isRemote) async {
-    final localList = await _dao.getAllVillageFcstList();
+  // 단기 예보 (어제 - 오늘, 오늘 - 내일 - 모레)
+  Future<Result<List<Fcst>>> getVilageFast(bool isToday, double longitude, double latitude) async {
+    final localList = await _dao.getAllVillageFcstList(isToday);
 
-    // 30분 전
     DateTime dateTime = DateTime.now();
-    String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
+    int day = dateTime.day;
+    if (!isToday) {
+      day -= 1;
+    }
+    String dt = DateTime(dateTime.year, dateTime.month, day,
             dateTime.hour, dateTime.minute - 30)
         .toString()
         .replaceAll(RegExp("[^0-9\\s]"), "")
@@ -477,17 +479,22 @@ class WeatherRepository {
     String date = dt.substring(0, 8);
     String checkTime = dt.substring(8, 10);
     int checkTimeIndex = int.parse(checkTime);
-    String time = baseTimeList[checkTimeIndex];
+    String time = '';
+    if (isToday) {
+     time = baseTimeList[checkTimeIndex];
+    } else {
+      time = '0200';
+    }
 
     // local
-    if (!isRemote && localList.isNotEmpty) {
+    if (localList.isNotEmpty) {
       if (localList[0].baseTime != null) {
         String localTime = localList[0].baseTime!.substring(0, 2);
         String callTime = time.substring(0, 2);
         String localDate = localList[0].baseDate ?? '';
         if (date == localDate) {
           if (callTime == localTime) {
-            print('getVilageFast() -> local return');
+            print('getVilageFast() -> local return / isToday = $isToday');
             return Result.success(localList.map((e) => e.toFcst()).toList());
           }
         }
@@ -495,14 +502,13 @@ class WeatherRepository {
     }
 
     // get location
-    Position position = await locationRepository.getLocation();
-    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
+    var gpsToData = ConvertGps.gpsToGRID(latitude, longitude);
     int x = gpsToData['x'];
     int y = gpsToData['y'];
 
     // remote
     try {
-      final response = await _api.getVilageFcst(date, time, x, y);
+      final response = await _api.getVilageFcst(date, time, x, y, isToday);
       final jsonResult = jsonDecode(response.body);
       FcstList list = FcstList.fromJson(jsonResult['response']['body']);
       List<Fcst> result = [];
@@ -514,10 +520,10 @@ class WeatherRepository {
       }
       // local update
       if (result.isNotEmpty) {
-        _dao.clearVilageFcstList();
-        _dao.insertVilageFcstList(result.map((e) => e.toFcstEntity()).toList());
+        _dao.clearVilageFcstList(isToday);
+        _dao.insertVilageFcstList(result.map((e) => e.toFcstEntity()).toList(), isToday);
       }
-      print('getVilageFast() -> api return');
+      print('getVilageFast() -> api return / isToday = $isToday');
       return Result.success(result);
     } catch (e) {
       return Result.error(Exception('getVilageFast failed: ${e.toString()}'));
@@ -531,8 +537,11 @@ class WeatherRepository {
     return WeatherCategory.fromJson(jsonObject[category]);
   }
 
+
+
+
   // 초단기 실황
-  Future<Result<List<Ncst>>> getUltraStrNcst(bool isRemote) async {
+  /*Future<Result<List<Ncst>>> getUltraStrNcst(bool isRemote) async {
     final localList = await _dao.getAllUltraNcstList();
 
     // 30분 전
@@ -589,10 +598,10 @@ class WeatherRepository {
     } catch (e) {
       return Result.error(Exception('getUltraStrNcst failed: ${e.toString()}'));
     }
-  }
+  }*/
 
   // 초단기 예보
-  Future<Result<List<Fcst>>> getUltraStrFcst(bool isRemote) async {
+  /*Future<Result<List<Fcst>>> getUltraStrFcst(bool isRemote) async {
     final localList = await _dao.getAllUltraFcstList();
 
     // 45분 전
@@ -648,5 +657,5 @@ class WeatherRepository {
     } catch (e) {
       return Result.error(Exception('getUltraStrFcst failed: ${e.toString()}'));
     }
-  }
+  }*/
 }

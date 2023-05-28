@@ -11,6 +11,7 @@ import 'package:sweater/repository/source/local/entity/dnsty_entity.dart';
 import 'package:sweater/repository/source/local/entity/fcst_entity.dart';
 import 'package:sweater/repository/source/local/entity/ncst_entity.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
+import 'package:sweater/repository/source/remote/model/fcst.dart';
 import 'package:sweater/repository/source/remote/remote_api.dart';
 import 'package:sweater/repository/weather_repository.dart';
 import 'package:sweater/utils/color_schemes.dart';
@@ -43,7 +44,47 @@ void main() async {
   var address = await repository.getAddressWithCoordinate();
   address.when(success: (adr) async {
     print(adr);
-    // 관측소 정보
+
+    double longitude = adr.x ?? 0;
+    double latitude = adr.y ?? 0;
+
+    List<Fcst> yesterdayTMN = [];
+    List<Fcst> yesterdayTMX = [];
+
+    List<Fcst> tomorrowTMN = [];
+    List<Fcst> tomorrowTMX = [];
+
+    // 어제 단기 예보
+    // 어제 - 오늘 : 최저 최고
+    // 0200
+    var yesterdayVilageFcst = await repository.getVilageFast(false, longitude, latitude);
+    yesterdayVilageFcst.when(success: (info) {
+      print('Yesterday Fcst list length -> ${info.length}');
+
+      yesterdayTMN = info.where((element) => element.category! == 'TMN').toList();
+      yesterdayTMX = info.where((element) => element.category! == 'TMX').toList();
+
+      print(yesterdayTMN);
+      print(yesterdayTMX);
+
+    }, error: (e) {
+      print(e);
+    });
+
+    // 오늘 단기 예보
+    // 오늘 - 내일 : 최저 최고 기온
+    var tomorrowVilageFcst = await repository.getVilageFast(true, longitude, latitude);
+    tomorrowVilageFcst.when(success: (info) {
+      print('Tomorrow Fcst list length -> ${info.length}');
+      tomorrowTMN = info.where((element) => element.category! == 'TMN').toList();
+      tomorrowTMX = info.where((element) => element.category! == 'TMX').toList();
+      print(tomorrowTMN);
+      print(tomorrowTMX);
+    }, error: (e) {
+      print(e);
+    });
+
+    // 관측소 정보 -> 자외선 치수
     String depth1 = adr.region1depthName ?? '';
     String depth2 = adr.region2depthName ?? '';
     var observatory =
@@ -62,6 +103,8 @@ void main() async {
     });
 
     // 중기 기상 정보를 위한 코드 가져오기
+    // 중기 예보 * 3일후 - 10일 후 까지
+    // 강수확률 평균, 하늘상태, 최고 최저 기온
     var midCode = await repository.getMidCode(depth1, depth2);
     midCode.when(success: (info) async {
       print(info);
@@ -74,14 +117,14 @@ void main() async {
       }, error: (e) {
         print(e);
       });
-    }, error: (e) {
-      print(e);
-    });
 
-    // 중기 육상 예보
-    var midLandFcst = await repository.getMidLandFcst(depth1, depth2);
-    midLandFcst.when(success: (info) {
-      print(info);
+      // 중기 육상 예보
+      var midLandFcst = await repository.getMidLandFcst(depth1, depth2);
+      midLandFcst.when(success: (info) {
+        print(info);
+      }, error: (e) {
+        print(e);
+      });
     }, error: (e) {
       print(e);
     });
@@ -97,8 +140,6 @@ void main() async {
     });
 
     // 출몰
-    double longitude = adr.x ?? 0;
-    double latitude = adr.y ?? 0;
     var riseSet = await repository.getRiseSetWithCoordinate(longitude, latitude);
     riseSet.when(success: (info) {
       print(info);
@@ -108,43 +149,6 @@ void main() async {
   }, error: (e) {
     print(e);
   });
-
-  // 예보 (4일  80시간) * 오늘 내일정보
-  // 3시간 단위 업데이트
-  // 강수확률 평균, 하늘상태, 최고 최저 기온
-  /*var vilageFcst = await repository.getVilageFast(false);
-  vilageFcst.when(success: (info) {
-    for (Fcst fcst in info) {
-      print(fcst);
-    }
-  }, error: (e) {
-    print(e);
-  });*/
-
-  // 초단기 실황 * 오늘 정보 업데이트
-  /*var ultraNcst = await repository.getUltraStrNcst(false);
-  ultraNcst.when(success: (info) {
-    for (Ncst ncst in info) {
-      print(ncst);
-    }
-  }, error: (e) {
-    print(e);
-  });*/
-
-  // 예보 (6시간) * 제거
-  /*var ultraFcst = await repository.getUltraStrFcst(false);
-  ultraFcst.when(success: (info) {
-    for (Fcst fcst in info) {
-      print(fcst);
-    }
-  }, error: (e) {
-    print(e);
-  });*/
-
-  // 중기 예보 * 3일후 - 10일 후 까지
-  // 강수확률 평균, 하늘상태, 최고 최저 기온
-
-  // 생활지수
 }
 
 class MyApp extends StatelessWidget {

@@ -145,22 +145,38 @@ class WeatherDao {
   }
 
   static const vilageFcst = 'vilageFcst';
-  Future<void> insertVilageFcstList(List<FcstEntity> fcstListEntities) async {
-    final box = await Hive.openBox<FcstEntity>(vilageFcst);
-    await box.addAll(fcstListEntities);
+  static const prevVilageFcst = 'prevVilageFcst';
+  Future<void> insertVilageFcstList(List<FcstEntity> list, bool isToday) async {
+    if (isToday) {
+      final box = await Hive.openBox<FcstEntity>(vilageFcst);
+      await box.addAll(list);
+    } else {
+      final box = await Hive.openBox<FcstEntity>(prevVilageFcst);
+      await box.addAll(list);
+    }
   }
 
-  Future clearVilageFcstList() async {
-    final box = await Hive.openBox<FcstEntity>(vilageFcst);
-    await box.clear();
+  Future clearVilageFcstList(bool isToday) async {
+    if (isToday) {
+      final box = await Hive.openBox<FcstEntity>(vilageFcst);
+      await box.clear();
+    } else {
+      final box = await Hive.openBox<FcstEntity>(prevVilageFcst);
+      await box.clear();
+    }
   }
 
-  Future<List<FcstEntity>> getAllVillageFcstList() async {
-    final box = await Hive.openBox<FcstEntity>(vilageFcst);
-    return box.values.toList();
+  Future<List<FcstEntity>> getAllVillageFcstList(bool isToday) async {
+    if (isToday) {
+      final box = await Hive.openBox<FcstEntity>(vilageFcst);
+      return box.values.toList();
+    } else {
+      final box = await Hive.openBox<FcstEntity>(prevVilageFcst);
+      return box.values.toList();
+    }
   }
 
-  static const ultraNcst = 'ultraNcst';
+ /* static const ultraNcst = 'ultraNcst';
   static const ultraFcst = 'ultraFcst';
   Future<void> insertUltraNcstList(List<NcstEntity> ncstListEntities) async {
     final box = await Hive.openBox<NcstEntity>(ultraNcst);
@@ -190,5 +206,5 @@ class WeatherDao {
   Future<List<FcstEntity>> getAllUltraFcstList() async {
     final box = await Hive.openBox<FcstEntity>(ultraFcst);
     return box.values.toList();
-  }
+  }*/
 }
