@@ -95,7 +95,7 @@ class RemoteApi {
     Uri.https(baseUrl, '/1360000/VilageFcstInfoService_2.0/getVilageFcst', {
       'dataType': 'JSON',
       'serviceKey': serviceKey ?? '',
-      'numOfRows': isToday ? '1000' : '300',
+      'numOfRows': isToday ? '1000' : '600',
       'pageNo': '1',
       'base_date': date,
       'base_time': time,

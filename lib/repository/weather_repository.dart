@@ -10,6 +10,7 @@ import 'package:sweater/repository/source/remote/model/fcst.dart';
 import 'package:sweater/repository/source/remote/model/mid_code.dart';
 import 'package:sweater/repository/source/remote/model/mid_land_fcst.dart';
 import 'package:sweater/repository/source/remote/model/mid_ta.dart';
+import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
 import 'package:sweater/repository/source/remote/model/rise_set.dart';
 import 'package:sweater/repository/source/remote/model/uv_rays.dart';
@@ -530,24 +531,14 @@ class WeatherRepository {
     }
   }
 
-  // 날씨 category 에 따른 정보 가져오기
-  Future<WeatherCategory> getWeatherCode(String category) async {
-    final jsonString = await rootBundle.loadString('assets/data/code.json');
-    final jsonObject = jsonDecode(jsonString);
-    return WeatherCategory.fromJson(jsonObject[category]);
-  }
-
-
-
-
   // 초단기 실황
-  /*Future<Result<List<Ncst>>> getUltraStrNcst(bool isRemote) async {
+  Future<Result<List<Ncst>>> getUltraStrNcst(double longitude, double latitude) async {
     final localList = await _dao.getAllUltraNcstList();
 
     // 30분 전
     DateTime dateTime = DateTime.now();
     String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-            dateTime.hour, dateTime.minute - 30)
+        dateTime.hour, dateTime.minute - 30)
         .toString()
         .replaceAll(RegExp("[^0-9\\s]"), "")
         .replaceAll(" ", "");
@@ -556,7 +547,7 @@ class WeatherRepository {
     String checkTime = dt.substring(8, 10);
 
     // local
-    if (!isRemote && localList.isNotEmpty) {
+    if (localList.isNotEmpty) {
       if (localList[0].baseTime != null) {
         String localTime = localList[0].baseTime!.substring(0, 2);
         String localDate = localList[0].baseDate ?? '';
@@ -570,8 +561,7 @@ class WeatherRepository {
     }
 
     // get location
-    Position position = await locationRepository.getLocation();
-    var gpsToData = ConvertGps.gpsToGRID(position.latitude, position.longitude);
+    var gpsToData = ConvertGps.gpsToGRID(latitude, longitude);
     int x = gpsToData['x'];
     int y = gpsToData['y'];
     //print(gpsToData);
@@ -598,7 +588,14 @@ class WeatherRepository {
     } catch (e) {
       return Result.error(Exception('getUltraStrNcst failed: ${e.toString()}'));
     }
-  }*/
+  }
+
+  // 날씨 category 에 따른 정보 가져오기
+  Future<WeatherCategory> getWeatherCode(String category) async {
+    final jsonString = await rootBundle.loadString('assets/data/code.json');
+    final jsonObject = jsonDecode(jsonString);
+    return WeatherCategory.fromJson(jsonObject[category]);
+  }
 
   // 초단기 예보
   /*Future<Result<List<Fcst>>> getUltraStrFcst(bool isRemote) async {

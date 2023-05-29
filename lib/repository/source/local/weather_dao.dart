@@ -176,8 +176,7 @@ class WeatherDao {
     }
   }
 
- /* static const ultraNcst = 'ultraNcst';
-  static const ultraFcst = 'ultraFcst';
+  static const ultraNcst = 'ultraNcst';
   Future<void> insertUltraNcstList(List<NcstEntity> ncstListEntities) async {
     final box = await Hive.openBox<NcstEntity>(ultraNcst);
     await box.addAll(ncstListEntities);
@@ -193,6 +192,7 @@ class WeatherDao {
     return box.values.toList();
   }
 
+  /*static const ultraFcst = 'ultraFcst';
   Future<void> insertUltraFcstList(List<FcstEntity> fcstListEntities) async {
     final box = await Hive.openBox<FcstEntity>(ultraFcst);
     await box.addAll(fcstListEntities);
