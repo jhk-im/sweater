@@ -14,6 +14,11 @@ part 'weather_main_state.g.dart';
 @freezed
 class WeatherMainState with _$WeatherMainState {
   const factory WeatherMainState({
+    Address? address,
+    Observatory? observatory,
+    MidCode? midCode,
+    RiseSet? riseSet,
+    UVRays? uvRays,
     @Default([]) List<Ncst> ncstList,
     @Default([]) List<Fcst> tmnList,
     @Default([]) List<Fcst> tmxList,
@@ -23,11 +28,6 @@ class WeatherMainState with _$WeatherMainState {
     @Default(false) bool isLoading,
     @Default(false) bool isRefresh,
     @Default(0) int errorNum,
-    Address? address,
-    Observatory? observatory,
-    MidCode? midCode,
-    RiseSet? riseSet,
-    UVRays? uvRays,
   }) = _WeatherMainState;
 
   factory WeatherMainState.fromJson(Map<String, Object?> json) =>

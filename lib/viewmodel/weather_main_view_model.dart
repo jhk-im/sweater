@@ -94,11 +94,11 @@ class WeatherMainViewModel with ChangeNotifier {
         await _repository.getVilageFast(false, longitude, latitude);
     yesterdayGetVilageFcst.when(success: (yesterdayFcstList) {
       //print('Yesterday Fcst list length -> ${info.length}');
-      final tmnList = state.tmnList.sublist(0);
+      List<Fcst> tmnList = [];
       tmnList.addAll(yesterdayFcstList
           .where((element) => element.category! == 'TMN')
           .toList());
-      final tmxList = state.tmxList.sublist(0);
+      List<Fcst> tmxList = [];
       tmxList.addAll(yesterdayFcstList
           .where((element) => element.category! == 'TMX')
           .toList());
@@ -121,17 +121,18 @@ class WeatherMainViewModel with ChangeNotifier {
       tmnList.addAll(tomorrowFcstList
           .where((element) => element.category! == 'TMN')
           .toList());
-      final tmxList = state.tmnList.sublist(0);
+      final tmxList = state.tmxList.sublist(0);
       tmxList.addAll(tomorrowFcstList
           .where((element) => element.category! == 'TMX')
           .toList());
-      final popList = state.popList.sublist(0);
+      List<Fcst> popList = [];
       _updatePopList(
           tomorrowFcstList
               .where((element) => element.category! == 'POP')
               .toList(),
           popList);
-      final skyList = state.popList.sublist(0);
+      List<Fcst> skyList = [];
+      print(skyList);
       _updateSkyList(
           tomorrowFcstList
               .where((element) => element.category! == 'SKY')
@@ -202,11 +203,11 @@ class WeatherMainViewModel with ChangeNotifier {
       popList.add(_createFcst(popList.last, midLandFcst.rnSt9 ?? 0));
       popList.add(_createFcst(popList.last, midLandFcst.rnSt10 ?? 0));
       final skyList = state.skyList.sublist(0);
-      skyList.add(_createFcst(skyList.last, midLandFcst.wf3Am ?? ''));
-      skyList.add(_createFcst(skyList.last, midLandFcst.wf4Am ?? ''));
-      skyList.add(_createFcst(skyList.last, midLandFcst.wf5Am ?? ''));
-      skyList.add(_createFcst(skyList.last, midLandFcst.wf6Am ?? ''));
-      skyList.add(_createFcst(skyList.last, midLandFcst.wf7Am ?? ''));
+      skyList.add(_createFcst(skyList.last, midLandFcst.wf3Pm ?? ''));
+      skyList.add(_createFcst(skyList.last, midLandFcst.wf4Pm ?? ''));
+      skyList.add(_createFcst(skyList.last, midLandFcst.wf5Pm ?? ''));
+      skyList.add(_createFcst(skyList.last, midLandFcst.wf6Pm ?? ''));
+      skyList.add(_createFcst(skyList.last, midLandFcst.wf7Pm ?? ''));
       skyList.add(_createFcst(skyList.last, midLandFcst.wf8 ?? ''));
       skyList.add(_createFcst(skyList.last, midLandFcst.wf9 ?? ''));
       skyList.add(_createFcst(skyList.last, midLandFcst.wf10 ?? ''));
@@ -308,6 +309,7 @@ class WeatherMainViewModel with ChangeNotifier {
     var startDate = '';
     List<String> values = [];
     for (Fcst fcst in list) {
+      print(fcst);
       if (startDate == fcst.fcstDate) {
         if (updateList.isNotEmpty) {
           values.add(fcst.fcstValue ?? '');
@@ -328,12 +330,15 @@ class WeatherMainViewModel with ChangeNotifier {
           Fcst updateFcst = updateList[updateList.length - 1];
           updateFcst.fcstValue =
               fcst.weatherCategory?.codeValues?[int.parse(value)];
+          print(updateFcst);
           values.clear();
         }
         updateList.add(fcst);
       }
       startDate = fcst.fcstDate ?? '';
     }
+    Fcst last = updateList.last;
+    last.fcstValue = last.weatherCategory?.codeValues?[int.parse(last.fcstValue ?? '')];
   }
 
   Fcst _createFcst(Fcst last, value) {

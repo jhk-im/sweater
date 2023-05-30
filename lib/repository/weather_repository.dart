@@ -104,7 +104,7 @@ class WeatherRepository {
         .replaceAll(RegExp("[^0-9\\s]"), "")
         .replaceAll(" ", "");
     String prev = prevDt.substring(0, 8);
-    if (currentTime < 6 || currentTime > 18) {
+    if (currentTime < 6) {
       date = '${prev}1800';
     } else if (currentTime > 6 && currentTime < 18) {
       date = '${current}0600';
@@ -386,6 +386,9 @@ class WeatherRepository {
         return Result.success(localList[0].toMidTa());
       }
     }
+
+    print('tmFc');
+    print(tmFc);
 
     // remote
     MidTa result = MidTa();
