@@ -25,7 +25,7 @@ class MainTopWidget extends StatelessWidget {
               style: title100(context),
             ),
             Text(
-              '${_getTemperatureFromNcst(state.ncstList)}°',
+              _getTemperatureFromNcst(state.ncstList),
               style: largeTitleBold(context),
             ),
             Text(
@@ -33,7 +33,7 @@ class MainTopWidget extends StatelessWidget {
               style: body(context),
             ),
             Text(
-              '${_getTemperatureFromFcst(state.tmnList)}° / ${_getTemperatureFromFcst(state.tmxList)}°',
+              '${_getTemperatureFromFcst(state.tmnList)} / ${_getTemperatureFromFcst(state.tmxList)}',
               style: body(context),
             ),
           ],
@@ -45,7 +45,7 @@ class MainTopWidget extends StatelessWidget {
   String _getTemperatureFromFcst(List<Fcst> fcstList) {
     if (fcstList.isNotEmpty) {
       Fcst fcst = fcstList[0];
-      return fcst.fcstValue?.substring(0, fcst.fcstValue!.length - 2) ?? '';
+      return '${fcst.fcstValue?.substring(0, fcst.fcstValue!.length - 2) ?? ''}°';
     }
     return '';
   }
@@ -54,7 +54,7 @@ class MainTopWidget extends StatelessWidget {
     if (ncstList.isNotEmpty) {
       for (Ncst ncst in ncstList) {
         if (ncst.category == 'T1H') {
-          return ncst.obsrValue ?? '';
+          return '${ncst.obsrValue?.substring(0, ncst.obsrValue!.length - 2) ?? ''}°';
         }
       }
     }

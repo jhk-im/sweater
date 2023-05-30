@@ -472,7 +472,7 @@ class WeatherRepository {
 
     DateTime dateTime = DateTime.now();
     int day = dateTime.day;
-    if (!isToday) {
+    if (!isToday || dateTime.hour == 23 || dateTime.hour < 3) {
       day -= 1;
     }
     String dt = DateTime(dateTime.year, dateTime.month, day,

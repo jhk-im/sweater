@@ -309,7 +309,6 @@ class WeatherMainViewModel with ChangeNotifier {
     var startDate = '';
     List<String> values = [];
     for (Fcst fcst in list) {
-      print(fcst);
       if (startDate == fcst.fcstDate) {
         if (updateList.isNotEmpty) {
           values.add(fcst.fcstValue ?? '');
