@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class RemoteApi {
+class WeatherApi {
   static const baseUrl = "apis.data.go.kr";
   static final serviceKey = dotenv.env['SERVICE_KEY'];
   static const kakaoUrl = "dapi.kakao.com";

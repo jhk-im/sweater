@@ -18,14 +18,14 @@ import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/mapper/weather_mapper.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
 import 'package:sweater/repository/location_repository.dart';
-import 'package:sweater/repository/source/remote/remote_api.dart';
+import 'package:sweater/repository/source/remote/weather_api.dart';
 import 'package:sweater/utils/convert_gps.dart';
 import 'package:sweater/utils/result.dart';
 import 'package:xml/xml.dart';
 import 'package:xml2json/xml2json.dart';
 
 class WeatherRepository {
-  final RemoteApi _api;
+  final WeatherApi _api;
   final WeatherDao _dao;
   final _observatoryParser = ObservatoryParser();
   final _midCodeParser = MidCodeParser();
@@ -285,7 +285,7 @@ class WeatherRepository {
 
   // 측정소별 미세먼지 조회
   Future<Result<List<Dnsty>>> getMesureDnsty(
-      bool isRemote, String query) async {
+      bool isRemote, String depth2) async {
     final localList = await _dao.getAllMesureDnstyList();
 
     // local
@@ -313,7 +313,7 @@ class WeatherRepository {
 
     // remote
     try {
-      final response = await _api.getMsrstnAcctoRltmMesureDnsty(query);
+      final response = await _api.getMsrstnAcctoRltmMesureDnsty(depth2);
       final jsonResult = jsonDecode(response.body);
       DnstyList list = DnstyList.fromJson(jsonResult['response']['body']);
       List<Dnsty> result = [];
