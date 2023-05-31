@@ -61,6 +61,7 @@ API_KEY = 'KAKAO API Key';
   - Emulator Extended Controls -> Location -> 한국 특정 지역 검색 -> Set Location
 
 </br>
+</br>
 
 ```txt
 MIT License
