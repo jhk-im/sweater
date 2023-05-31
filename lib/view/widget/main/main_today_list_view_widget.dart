@@ -19,7 +19,7 @@ class MainTodayListViewWidget extends StatelessWidget {
           child: ListView.builder(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: 24,
+              itemCount: 26,
               itemBuilder: (context, index) {
                 return SizedBox(
                   width: 64.0,
