@@ -4,14 +4,21 @@ import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/utils/text_styles.dart';
 import 'package:sweater/viewmodel/weather_main_state.dart';
 
-class MainTopWidget extends StatelessWidget {
+class MainTopWidget extends StatefulWidget {
   const MainTopWidget({
     super.key,
     required this.state,
+    required this.isScrollDown,
   });
 
   final WeatherMainState state;
+  final bool isScrollDown;
 
+  @override
+  State<MainTopWidget> createState() => _MainTopWidgetState();
+}
+
+class _MainTopWidgetState extends State<MainTopWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -21,20 +28,31 @@ class MainTopWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              state.address?.region1depthName ?? '',
+              widget.state.address?.region1depthName ?? '',
               style: title100(context),
             ),
+            if (!widget.isScrollDown)
             Text(
-              _getTemperatureFromNcst(state.ncstList),
+              _getTemperatureFromNcst(widget.state.ncstList),
               style: largeTitleBold(context),
             ),
+            if (!widget.isScrollDown)
             Text(
-              state.skyList.isNotEmpty ? state.skyList[0].fcstValue ?? '' : '',
+              widget.state.skyList.isNotEmpty ? widget.state.skyList[0].fcstValue ?? '' : '',
               style: body(context),
             ),
+            if (!widget.isScrollDown)
             Text(
-              '${_getTemperatureFromFcst(state.tmnList)} / ${_getTemperatureFromFcst(state.tmxList)}',
+              '${_getTemperatureFromFcst(widget.state.tmnList)} / ${_getTemperatureFromFcst(widget.state.tmxList)}',
               style: body(context),
+            ),
+            if (widget.isScrollDown)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                '${_getTemperatureFromNcst(widget.state.ncstList)} / ${widget.state.skyList.isNotEmpty ? widget.state.skyList[0].fcstValue ?? '' : ''}',
+                style: body(context),
+              ),
             ),
           ],
         ),

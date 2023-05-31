@@ -1,18 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sweater/view/widget/loading_widget.dart';
-import 'package:sweater/view/widget/main_grid_view_widget.dart';
-import 'package:sweater/view/widget/main_top_widget.dart';
-import 'package:sweater/view/widget/main_weeks_list_view_widget.dart';
+import 'package:sweater/view/widget/main/main_grid_view_widget.dart';
+import 'package:sweater/view/widget/main/main_today_list_view_widget.dart';
+import 'package:sweater/view/widget/main/main_top_widget.dart';
+import 'package:sweater/view/widget/main/main_weeks_list_view_widget.dart';
 import 'package:sweater/viewmodel/weather_main_view_model.dart';
 
-class WeatherMainScreen extends StatelessWidget {
+class WeatherMainScreen extends StatefulWidget {
   const WeatherMainScreen({Key? key}) : super(key: key);
+
+  @override
+  State<WeatherMainScreen> createState() => _WeatherMainScreenState();
+}
+
+class _WeatherMainScreenState extends State<WeatherMainScreen> {
+  final ScrollController _controller = ScrollController();
+
+  bool isScrollDown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      setState(() {
+        isScrollDown = _controller.offset > 0.0;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<WeatherMainViewModel>();
     final state = viewModel.state;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
@@ -24,11 +51,14 @@ class WeatherMainScreen extends StatelessWidget {
               children: [
                 MainTopWidget(
                   state: state,
+                  isScrollDown: isScrollDown,
                 ),
                 Expanded(
                   flex: 1,
                   child: ListView(
+                    controller: _controller,
                     children: [
+                      MainTodayListViewWidget(state: state),
                       MainWeeksListViewWidget(state: state),
                       MainGridViewWidget(state: state),
                     ],

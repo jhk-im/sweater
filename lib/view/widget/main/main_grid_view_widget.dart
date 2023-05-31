@@ -15,21 +15,19 @@ class MainGridViewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: SizedBox(
-        child: GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: 6,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // 행의 개수
-            childAspectRatio: 1 / 1, // 가로세로 비율
-            mainAxisSpacing: 8.0, // 수평 padding
-            crossAxisSpacing: 8.0, // 수직 padding
-          ),
-          itemBuilder: (BuildContext context, int index) {
-            return createCard(index, context);
-          },
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 6,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, // 행의 개수
+          childAspectRatio: 1 / 1, // 가로세로 비율
+          mainAxisSpacing: 8.0, // 수평 padding
+          crossAxisSpacing: 8.0, // 수직 padding
         ),
+        itemBuilder: (BuildContext context, int index) {
+          return createCard(index, context);
+        },
       ),
     );
   }
@@ -45,6 +43,9 @@ class MainGridViewWidget extends StatelessWidget {
                 Text(
                   '미세먼지',
                   style: caption(context, 1.0),
+                ),
+                const SizedBox(
+                  height: 4,
                 ),
                 Text(
                   state.dnstyList.isNotEmpty
@@ -65,6 +66,9 @@ class MainGridViewWidget extends StatelessWidget {
                 Text(
                   '초미세먼지',
                   style: caption(context, 1.0),
+                ),
+                const SizedBox(
+                  height: 4,
                 ),
                 Text(
                   state.dnstyList.isNotEmpty
@@ -92,6 +96,9 @@ class MainGridViewWidget extends StatelessWidget {
                   '자외선지수',
                   style: caption(context, 1.0),
                 ),
+                const SizedBox(
+                  height: 4,
+                ),
                 Text(
                   state.uvRays != null ? state.uvRays?.h0 ?? '' : '',
                   style: caption(context, 0.5),
@@ -113,6 +120,9 @@ class MainGridViewWidget extends StatelessWidget {
                 Text(
                   '습도',
                   style: caption(context, 1.0),
+                ),
+                const SizedBox(
+                  height: 4,
                 ),
                 Text(
                   state.ncstList.isNotEmpty
@@ -139,6 +149,9 @@ class MainGridViewWidget extends StatelessWidget {
                 Text(
                   '바람',
                   style: caption(context, 1.0),
+                ),
+                const SizedBox(
+                  height: 4,
                 ),
                 Text(
                   state.ncstList.isNotEmpty
