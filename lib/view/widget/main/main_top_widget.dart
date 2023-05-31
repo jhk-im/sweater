@@ -22,7 +22,9 @@ class _MainTopWidgetState extends State<MainTopWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24.0,),
+      padding: const EdgeInsets.symmetric(
+        vertical: 24.0,
+      ),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -32,28 +34,34 @@ class _MainTopWidgetState extends State<MainTopWidget> {
               style: title100(context),
             ),
             if (!widget.isScrollDown)
-            Text(
-              _getTemperatureFromNcst(widget.state.ncstList),
-              style: largeTitleBold(context),
-            ),
+              Text(
+                widget.state.todayTmpList.isNotEmpty
+                    ? '${widget.state.todayTmpList[0].fcstValue ?? ''}°'
+                    : '',
+                style: largeTitleBold(context),
+              ),
             if (!widget.isScrollDown)
-            Text(
-              widget.state.skyList.isNotEmpty ? widget.state.skyList[0].fcstValue ?? '' : '',
-              style: body(context),
-            ),
-            if (!widget.isScrollDown)
-            Text(
-              '${_getTemperatureFromFcst(widget.state.tmnList)} / ${_getTemperatureFromFcst(widget.state.tmxList)}',
-              style: body(context),
-            ),
-            if (widget.isScrollDown)
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: Text(
-                '${_getTemperatureFromNcst(widget.state.ncstList)} / ${widget.state.skyList.isNotEmpty ? widget.state.skyList[0].fcstValue ?? '' : ''}',
+              Text(
+                widget.state.skyList.isNotEmpty
+                    ? widget.state.skyList[0].fcstValue ?? ''
+                    : '',
                 style: body(context),
               ),
-            ),
+            if (!widget.isScrollDown)
+              Text(
+                '${_getTemperatureFromFcst(widget.state.tmnList)} / ${_getTemperatureFromFcst(widget.state.tmxList)}',
+                style: body(context),
+              ),
+            if (widget.isScrollDown)
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Text(
+                  '${widget.state.todayTmpList.isNotEmpty
+                      ? '${widget.state.todayTmpList[0].fcstValue ?? ''}°'
+                      : ''} / ${widget.state.skyList.isNotEmpty ? widget.state.skyList[0].fcstValue ?? '' : ''}',
+                  style: body(context),
+                ),
+              ),
           ],
         ),
       ),

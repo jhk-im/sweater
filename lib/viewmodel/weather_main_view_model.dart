@@ -358,7 +358,65 @@ class WeatherMainViewModel with ChangeNotifier {
     getRiseSet.when(success: (riseSet) {
       print('---일출/일몰---');
       print(riseSet);
-      _state = state.copyWith(riseSet: riseSet);
+      int sunrise = 5;
+      int sunset = 19;
+      sunrise = int.parse(riseSet.sunrise?.substring(0, 2) ?? '05');
+      sunset = int.parse(riseSet.sunset?.substring(0, 2) ?? '19');
+
+      List<Fcst> todayTmpList = state.todayTmpList.sublist(0);
+      List<Fcst> yesterdayTmpList = state.yesterdayTmpList.sublist(0);
+      List<Fcst> tomorrowTmpList = state.tomorrowTmpList.sublist(0);
+      List<Fcst> todaySkyList = state.todaySkyList.sublist(0);
+      List<Fcst> todayPopList = state.todayPopList.sublist(0);
+      int count = 0;
+      int checkCount = 1;
+      for (Fcst fcst in state.todayTmpList) {
+        final time = int.parse(fcst.fcstTime?.substring(0, 2) ?? '0');
+        Fcst tmnFcst = Fcst();
+        Fcst skyFcst = Fcst();
+        Fcst popFcst = Fcst();
+        if (time == sunrise) {
+          tmnFcst.fcstTime = '일출';
+          tmnFcst.fcstValue = riseSet.sunrise;
+          skyFcst.fcstValue = '일출';
+          popFcst.fcstValue = '0';
+          todayTmpList.insert(count + checkCount, tmnFcst);
+          todaySkyList.insert(count + checkCount, skyFcst);
+          todayPopList.insert(count + checkCount, popFcst);
+          if (yesterdayTmpList.length >= count + checkCount) {
+            yesterdayTmpList.insert(count + checkCount, tmnFcst);
+          }
+          if (tomorrowTmpList.length >= count + checkCount) {
+            tomorrowTmpList.insert(count + checkCount, tmnFcst);
+          }
+          checkCount++;
+        }
+
+        if (time == sunset) {
+          tmnFcst.fcstTime = '일몰';
+          tmnFcst.fcstValue = riseSet.sunset;
+          skyFcst.fcstValue = '일몰';
+          popFcst.fcstValue = '0';
+          todayTmpList.insert(count + checkCount, tmnFcst);
+          todaySkyList.insert(count + checkCount, skyFcst);
+          todayPopList.insert(count + checkCount, popFcst);
+          if (yesterdayTmpList.length >= count + checkCount) {
+            yesterdayTmpList.insert(count + checkCount, tmnFcst);
+          }
+          if (tomorrowTmpList.length >= count + checkCount) {
+            tomorrowTmpList.insert(count + checkCount, tmnFcst);
+          }
+          checkCount++;
+        }
+        count++;
+      }
+      _state = state.copyWith(
+          riseSet: riseSet,
+          todayTmpList: todayTmpList,
+          todaySkyList: todaySkyList,
+          todayPopList: todayPopList,
+          yesterdayTmpList: yesterdayTmpList,
+          tomorrowTmpList: tomorrowTmpList);
     }, error: (e) {
       print(e);
       _state = state.copyWith(
