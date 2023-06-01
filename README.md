@@ -52,6 +52,14 @@ API_KEY = 'KAKAO API Key';
 
 </br>
 
+## Terminal
+
+```zsh
+flutter pub run build_runner build 
+```
+
+</br>
+
 ## Emulator 설정
 
 - iOS
