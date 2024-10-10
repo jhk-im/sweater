@@ -5,7 +5,7 @@ import 'package:sweater/repository/source/local/entity/fcst_entity.dart';
 import 'package:sweater/repository/source/local/entity/mid_code_entity.dart';
 import 'package:sweater/repository/source/local/entity/mid_land_fcst_entity.dart';
 import 'package:sweater/repository/source/local/entity/mid_ta_entity.dart';
-import 'package:sweater/repository/source/local/entity/ultra_short_term_entity.dart';
+import 'package:sweater/repository/source/local/entity/weather_item_entity.dart';
 import 'package:sweater/repository/source/local/entity/observatory_entity.dart';
 import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
 import 'package:sweater/repository/source/local/entity/uv_rays_entity.dart';
@@ -177,18 +177,18 @@ class WeatherDao {
   }
 
   static const ultraShortTerm = 'ultraShortTerm';
-  Future<void> insertUltraShortTermList(List<UltraShortTermEntity> ultraShortTermEntities) async {
-    final box = await Hive.openBox<UltraShortTermEntity>(ultraShortTerm);
-    await box.addAll(ultraShortTermEntities);
+  Future<void> insertUltraShortTermList(List<WeatherItemEntity> weatherItemEntity) async {
+    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTerm);
+    await box.addAll(weatherItemEntity);
   }
 
   Future clearUltraShortTermList() async {
-    final box = await Hive.openBox<UltraShortTermEntity>(ultraShortTerm);
+    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTerm);
     await box.clear();
   }
 
-  Future<List<UltraShortTermEntity>> getAllUltraShortTermList() async {
-    final box = await Hive.openBox<UltraShortTermEntity>(ultraShortTerm);
+  Future<List<WeatherItemEntity>> getAllUltraShortTermList() async {
+    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTerm);
     return box.values.toList();
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sweater/repository/source/remote/model/short_term.dart';
-import 'package:sweater/repository/source/remote/model/ultra_short_term_response.dart';
+import 'package:sweater/repository/source/remote/model/weather_response.dart';
 import 'package:sweater/utils/text_styles.dart';
 import 'package:sweater/viewmodel/weather_main_state.dart';
 
@@ -80,11 +80,11 @@ class _MainTopWidgetState extends State<MainTopWidget> {
     return '';
   }
 
-  String _getTemperatureFromUltraShortTerm(List<UltraShortTerm> list) {
+  String _getTemperatureFromUltraShortTerm(List<WeatherItem> list) {
     if (list.isNotEmpty) {
-      for (UltraShortTerm ust in list) {
-        if (ust.category == 'T1H') {
-          return '${ust.obsrValue?.substring(0, ust.obsrValue!.length - 2) ?? ''}°';
+      for (WeatherItem item in list) {
+        if (item.category == 'T1H') {
+          return '${item.obsrValue?.substring(0, item.obsrValue!.length - 2) ?? ''}°';
         }
       }
     }

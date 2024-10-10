@@ -5,24 +5,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 import 'package:sweater/repository/source/remote/address_api_service.dart';
 import 'package:sweater/repository/source/remote/model/address_response.dart';
-import 'package:sweater/repository/source/remote/model/fine_dust.dart';
-import 'package:sweater/repository/source/remote/model/short_term.dart';
-import 'package:sweater/repository/source/remote/model/mid_code.dart';
-import 'package:sweater/repository/source/remote/model/mid_term_land.dart';
-import 'package:sweater/repository/source/remote/model/mid_term_temperature.dart';
-import 'package:sweater/repository/source/remote/model/observatory.dart';
-import 'package:sweater/repository/source/remote/model/sun_rise_set.dart';
-import 'package:sweater/repository/source/remote/model/ultra_short_term_response.dart';
-import 'package:sweater/repository/source/remote/model/ultraviolet.dart';
+import 'package:sweater/repository/source/remote/model/weather_response.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/mapper/weather_mapper.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
-import 'package:sweater/repository/source/remote/weather_api.dart';
 import 'package:sweater/repository/source/remote/weather_api_service.dart';
 import 'package:sweater/utils/convert_gps.dart';
 import 'package:sweater/repository/source/remote/result/result.dart';
-import 'package:xml/xml.dart';
-import 'package:xml2json/xml2json.dart';
 
 class WeatherRepository {
   final WeatherApiService _weatherApiService;
@@ -128,7 +117,7 @@ class WeatherRepository {
   }
 
   // 초단기 실황
-  Future<Result<List<UltraShortTerm>>> getUltraShortTerm(double longitude, double latitude) async {
+  Future<Result<List<WeatherItem>>> getUltraShortTerm(double longitude, double latitude) async {
     final localList = await _dao.getAllUltraShortTermList();
 
     // 30분 전
@@ -166,14 +155,14 @@ class WeatherRepository {
       final response =
       await _weatherApiService.getUltraShortTerm('10', '1', date, time, x, y);
       if (response.response.body?.items?.item != null) {
-        List<UltraShortTerm> result = [];
+        List<WeatherItem> result = [];
         for (var item in response.response.body!.items!.item!) {
           item.weatherCategory = await _getWeatherCode(item.category ?? '');
           result.add(item);
         }
         if (result.isNotEmpty) {
           _dao.clearUltraShortTermList();
-          _dao.insertUltraShortTermList(result.map((e) => e.toUltraShortTermEntity()).toList());
+          _dao.insertUltraShortTermList(result.map((e) => e.toWeatherItemEntity()).toList());
         }
         logger.d('getUltraShortTerm() -> api return $result');
         return Result.success(result);

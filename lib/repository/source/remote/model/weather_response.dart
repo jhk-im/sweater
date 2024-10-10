@@ -1,20 +1,20 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 
-part 'ultra_short_term_response.g.dart';
+part 'weather_response.g.dart';
 
 @JsonSerializable()
-class UltraShortTermResponse {
+class WeatherResponse {
   final ResponseData response;
 
-  UltraShortTermResponse({
+  WeatherResponse({
     required this.response,
   });
 
-  factory UltraShortTermResponse.fromJson(Map<String, dynamic> json) =>
-      _$UltraShortTermResponseFromJson(json);
+  factory WeatherResponse.fromJson(Map<String, dynamic> json) =>
+      _$WeatherResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UltraShortTermResponseToJson(this);
+  Map<String, dynamic> toJson() => _$WeatherResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -73,7 +73,7 @@ class ResponseBody {
 
 @JsonSerializable()
 class Items {
-  final List<UltraShortTerm>? item;
+  final List<WeatherItem>? item;
 
   Items({
     this.item,
@@ -86,26 +86,32 @@ class Items {
 }
 
 @JsonSerializable()
-class UltraShortTerm {
+class WeatherItem {
   final String? baseDate;
   final String? baseTime;
   final String? category;
+  final String? fcstDate;
+  final String? fcstTime;
+  final String? fcstValue;
   final int? nx;
   final int? ny;
   final String? obsrValue;
   WeatherCategory? weatherCategory;
 
-  UltraShortTerm({
+  WeatherItem({
     this.baseDate,
     this.baseTime,
     this.category,
+    this.fcstDate,
+    this.fcstTime,
+    this.fcstValue,
     this.nx,
     this.ny,
     this.obsrValue,
   });
 
-  factory UltraShortTerm.fromJson(Map<String, dynamic> json) =>
-      _$UltraShortTermFromJson(json);
+  factory WeatherItem.fromJson(Map<String, dynamic> json) =>
+      _$WeatherItemFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UltraShortTermToJson(this);
+  Map<String, dynamic> toJson() => _$WeatherItemToJson(this);
 }

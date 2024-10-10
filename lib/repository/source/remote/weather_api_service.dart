@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:sweater/repository/source/remote/model/address_response.dart';
-import 'package:sweater/repository/source/remote/model/ultra_short_term_response.dart';
+import 'package:sweater/repository/source/remote/model/weather_response.dart';
 
 part 'weather_api_service.g.dart';
 
@@ -13,7 +13,7 @@ abstract class WeatherApiService {
   }
 
   @GET("/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst")
-  Future<UltraShortTermResponse> getUltraShortTerm(
+  Future<WeatherResponse> getUltraShortTerm(
       @Query('numOfRows') String numOfRows,
       @Query('pageNo') String pageNo,
       @Query('base_date') String date,
@@ -21,8 +21,8 @@ abstract class WeatherApiService {
       @Query('nx') int x,
       @Query('ny') int y);
 
-  @GET("/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst")
-  Future<UltraShortTermResponse> getShortTerm(
+  @GET("/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst")
+  Future<WeatherResponse> getShortTerm(
       @Query('numOfRows') String numOfRows,
       @Query('pageNo') String pageNo,
       @Query('base_date') String date,

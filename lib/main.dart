@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sweater/repository/source/local/entity/address_entity.dart';
-import 'package:sweater/repository/source/local/entity/ultra_short_term_entity.dart';
+import 'package:sweater/repository/source/local/entity/weather_item_entity.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
 import 'package:sweater/repository/source/remote/address_api_service.dart';
 import 'package:sweater/repository/source/remote/weather_api_service.dart';
@@ -25,7 +25,7 @@ void main() async {
   // hive
   await Hive.initFlutter();
   Hive.registerAdapter(AddressEntityAdapter());
-  Hive.registerAdapter(UltraShortTermEntityAdapter());
+  Hive.registerAdapter(WeatherItemEntityAdapter());
 
   // repository
   final addressDio = Dio();

@@ -5,7 +5,7 @@ import 'package:sweater/repository/source/remote/model/short_term.dart';
 import 'package:sweater/repository/source/remote/model/mid_code.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
 import 'package:sweater/repository/source/remote/model/sun_rise_set.dart';
-import 'package:sweater/repository/source/remote/model/ultra_short_term_response.dart';
+import 'package:sweater/repository/source/remote/model/weather_response.dart';
 import 'package:sweater/repository/source/remote/model/ultraviolet.dart';
 
 part 'weather_main_state.freezed.dart';
@@ -19,7 +19,7 @@ class WeatherMainState with _$WeatherMainState {
     MidCode? midCode,
     SunRiseSet? riseSet,
     UVRays? uvRays,
-    @Default([]) List<UltraShortTerm> ultraShortTerm,
+    @Default([]) List<WeatherItem> ultraShortTerm,
     @Default([]) List<ShortTerm> yesterdayTmpList,
     @Default([]) List<ShortTerm> yesterdayPopList,
     @Default([]) List<ShortTerm> yesterdaySkyList,

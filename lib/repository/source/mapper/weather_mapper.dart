@@ -13,26 +13,28 @@ import 'package:sweater/repository/source/remote/model/mid_code.dart';
 import 'package:sweater/repository/source/remote/model/mid_term_land.dart';
 import 'package:sweater/repository/source/remote/model/mid_term_temperature.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
-import 'package:sweater/repository/source/remote/model/ultra_short_term_response.dart';
+import 'package:sweater/repository/source/remote/model/weather_response.dart';
 import 'package:sweater/repository/source/remote/model/ultraviolet.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/local/entity/address_entity.dart';
 import 'package:sweater/repository/source/local/entity/dnsty_entity.dart';
 import 'package:sweater/repository/source/local/entity/fcst_entity.dart';
-import 'package:sweater/repository/source/local/entity/ultra_short_term_entity.dart';
+import 'package:sweater/repository/source/local/entity/weather_item_entity.dart';
 
 import '../remote/model/sun_rise_set.dart';
 
-// 날씨 실황
-extension ToUltraShortTerm on UltraShortTermEntity {
-  UltraShortTerm toUltraShortTermEntity() {
-    var model = UltraShortTerm(
+extension ToWeatherItem on WeatherItemEntity {
+  WeatherItem toUltraShortTermEntity() {
+    var model = WeatherItem(
       baseDate: baseDate,
       baseTime: baseTime,
       category: category,
       nx: nx,
       ny: ny,
       obsrValue: obsrValue,
+      fcstDate: fcstDate,
+      fcstTime: fcstTime,
+      fcstValue: fcstValue,
     );
     model.weatherCategory =
         WeatherCategory(name: name, unit: unit, codeValues: codeValues);
@@ -40,10 +42,10 @@ extension ToUltraShortTerm on UltraShortTermEntity {
   }
 }
 
-extension ToUltraShortTermEntity on UltraShortTerm {
-  UltraShortTermEntity toUltraShortTermEntity() {
+extension ToWeatherItemEntity on WeatherItem {
+  WeatherItemEntity toWeatherItemEntity() {
     var entity =
-    UltraShortTermEntity(category: category ?? '', obsrValue: obsrValue ?? '');
+    WeatherItemEntity(category: category ?? '', obsrValue: obsrValue ?? '');
     entity.baseTime = baseTime;
     entity.baseDate = baseDate;
     entity.nx = nx;
@@ -51,6 +53,9 @@ extension ToUltraShortTermEntity on UltraShortTerm {
     entity.name = weatherCategory?.name ?? '';
     entity.unit = weatherCategory?.unit ?? '';
     entity.codeValues = weatherCategory?.codeValues ?? [];
+    entity.fcstDate = fcstDate;
+    entity.fcstTime = fcstTime;
+    entity.fcstValue = fcstValue;
     return entity;
   }
 }
