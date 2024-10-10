@@ -1,6 +1,6 @@
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 
-// 실황 조회
+// 초실황 조회
 class Ncst {
   String? baseDate;
   String? baseTime;

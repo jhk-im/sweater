@@ -1,4 +1,4 @@
-class MidTa {
+class MidTermTemperature {
   String? regId;
   int? taMin3;
   int? taMax3;
@@ -18,7 +18,7 @@ class MidTa {
   int? taMax10;
   String? date;
 
-  MidTa(
+  MidTermTemperature(
       {this.regId,
         this.taMin3,
         this.taMax3,
@@ -37,7 +37,7 @@ class MidTa {
         this.taMin10,
         this.taMax10,});
 
-  MidTa.fromJson(Map<String, dynamic> json) {
+  MidTermTemperature.fromJson(Map<String, dynamic> json) {
     regId = json['regId'];
     taMin3 = json['taMin3'];
     taMax3 = json['taMax3'];
@@ -81,7 +81,7 @@ class MidTa {
 
   @override
   String toString() {
-    return 'MidTa: { regId: $regId,  taMin3: $taMin3, taMax3: $taMax3, date: $date }';
+    return 'MidTermTemperature: { regId: $regId,  taMin3: $taMin3, taMax3: $taMax3, date: $date }';
   }
 }
 
@@ -121,15 +121,15 @@ class MidTaList {
 }
 
 class Items {
-  List<MidTa>? item;
+  List<MidTermTemperature>? item;
 
   Items({this.item});
 
   Items.fromJson(Map<String, dynamic> json) {
     if (json['item'] != null) {
-      item = <MidTa>[];
+      item = <MidTermTemperature>[];
       json['item'].forEach((v) {
-        item!.add(MidTa.fromJson(v));
+        item!.add(MidTermTemperature.fromJson(v));
       });
     }
   }

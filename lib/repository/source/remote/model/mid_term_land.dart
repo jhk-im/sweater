@@ -1,4 +1,4 @@
-class MidLandFcst {
+class MidTermLand {
   String? regId;
   int? rnSt3Am;
   int? rnSt3Pm;
@@ -28,7 +28,7 @@ class MidLandFcst {
   String? wf10;
   String? date;
 
-  MidLandFcst(
+  MidTermLand(
       {this.regId,
         this.rnSt3Am,
         this.rnSt3Pm,
@@ -57,7 +57,7 @@ class MidLandFcst {
         this.wf9,
         this.wf10});
 
-  MidLandFcst.fromJson(Map<String, dynamic> json) {
+  MidTermLand.fromJson(Map<String, dynamic> json) {
     regId = json['regId'];
     rnSt3Am = json['rnSt3Am'];
     rnSt3Pm = json['rnSt3Pm'];
@@ -121,25 +121,25 @@ class MidLandFcst {
 
   @override
   String toString() {
-    return 'MidLandFcst: { regId: $regId,  rnSt3Am: $rnSt3Am, rnSt3Pm: $rnSt3Pm, wf3Am: $wf3Am, wf3Pm: $wf3Pm, date: $date }';
+    return 'MidTermLand: { regId: $regId,  rnSt3Am: $rnSt3Am, rnSt3Pm: $rnSt3Pm, wf3Am: $wf3Am, wf3Pm: $wf3Pm, date: $date }';
   }
 }
 
-class MidLandFcstList {
+class MidTermLandList {
   String? dataType;
   Items? items;
   int? pageNo;
   int? numOfRows;
   int? totalCount;
 
-  MidLandFcstList(
+  MidTermLandList(
       {this.dataType,
         this.items,
         this.pageNo,
         this.numOfRows,
         this.totalCount});
 
-  MidLandFcstList.fromJson(Map<String, dynamic> json) {
+  MidTermLandList.fromJson(Map<String, dynamic> json) {
     dataType = json['dataType'];
     items = json['items'] != null ? Items.fromJson(json['items']) : null;
     pageNo = json['pageNo'];
@@ -161,15 +161,15 @@ class MidLandFcstList {
 }
 
 class Items {
-  List<MidLandFcst>? item;
+  List<MidTermLand>? item;
 
   Items({this.item});
 
   Items.fromJson(Map<String, dynamic> json) {
     if (json['item'] != null) {
-      item = <MidLandFcst>[];
+      item = <MidTermLand>[];
       json['item'].forEach((v) {
-        item!.add(MidLandFcst.fromJson(v));
+        item!.add(MidTermLand.fromJson(v));
       });
     }
   }
