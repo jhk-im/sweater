@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sweater/repository/source/remote/model/fcst.dart';
-import 'package:sweater/repository/source/remote/model/ncst.dart';
+import 'package:sweater/repository/source/remote/model/short_term.dart';
+import 'package:sweater/repository/source/remote/model/ultra_short_term_response.dart';
 import 'package:sweater/utils/text_styles.dart';
 import 'package:sweater/viewmodel/weather_main_state.dart';
 
@@ -33,10 +33,14 @@ class _MainTopWidgetState extends State<MainTopWidget> {
               widget.state.address?.region1depthName ?? '',
               style: title100(context),
             ),
+            Text(
+              '${widget.state.address?.region2depthName} ${widget.state.address?.region3depthName}',
+              style: body(context),
+            ),
             if (!widget.isScrollDown)
               Text(
-                widget.state.todayTmpList.isNotEmpty
-                    ? '${widget.state.todayTmpList[0].fcstValue ?? ''}°'
+                widget.state.ultraShortTerm.isNotEmpty
+                    ? _getTemperatureFromUltraShortTerm(widget.state.ultraShortTerm)
                     : '',
                 style: largeTitleBold(context),
               ),
@@ -68,19 +72,19 @@ class _MainTopWidgetState extends State<MainTopWidget> {
     );
   }
 
-  String _getTemperatureFromFcst(List<Fcst> fcstList) {
+  String _getTemperatureFromFcst(List<ShortTerm> fcstList) {
     if (fcstList.isNotEmpty) {
-      Fcst fcst = fcstList[0];
+      ShortTerm fcst = fcstList[0];
       return '${fcst.fcstValue?.substring(0, fcst.fcstValue!.length - 2) ?? ''}°';
     }
     return '';
   }
 
-  String _getTemperatureFromNcst(List<Ncst> ncstList) {
-    if (ncstList.isNotEmpty) {
-      for (Ncst ncst in ncstList) {
-        if (ncst.category == 'T1H') {
-          return '${ncst.obsrValue?.substring(0, ncst.obsrValue!.length - 2) ?? ''}°';
+  String _getTemperatureFromUltraShortTerm(List<UltraShortTerm> list) {
+    if (list.isNotEmpty) {
+      for (UltraShortTerm ust in list) {
+        if (ust.category == 'T1H') {
+          return '${ust.obsrValue?.substring(0, ust.obsrValue!.length - 2) ?? ''}°';
         }
       }
     }

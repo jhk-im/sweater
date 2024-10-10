@@ -1,5 +1,5 @@
 import 'package:csv/csv.dart';
-import 'package:sweater/repository/source/csv/csv_parser.dart';
+import 'package:sweater/repository/source/local/csv/csv_parser.dart';
 import 'package:sweater/repository/source/mapper/weather_mapper.dart';
 import 'package:sweater/repository/source/remote/dto/observatory_dto.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';

@@ -1,12 +1,12 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:sweater/repository/source/remote/model/address.dart';
-import 'package:sweater/repository/source/remote/model/dnsty.dart';
-import 'package:sweater/repository/source/remote/model/fcst.dart';
+import 'package:sweater/repository/source/remote/model/address_response.dart';
+import 'package:sweater/repository/source/remote/model/fine_dust.dart';
+import 'package:sweater/repository/source/remote/model/short_term.dart';
 import 'package:sweater/repository/source/remote/model/mid_code.dart';
-import 'package:sweater/repository/source/remote/model/ncst.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
-import 'package:sweater/repository/source/remote/model/rise_set.dart';
-import 'package:sweater/repository/source/remote/model/uv_rays.dart';
+import 'package:sweater/repository/source/remote/model/sun_rise_set.dart';
+import 'package:sweater/repository/source/remote/model/ultra_short_term_response.dart';
+import 'package:sweater/repository/source/remote/model/ultraviolet.dart';
 
 part 'weather_main_state.freezed.dart';
 part 'weather_main_state.g.dart';
@@ -14,26 +14,26 @@ part 'weather_main_state.g.dart';
 @freezed
 class WeatherMainState with _$WeatherMainState {
   const factory WeatherMainState({
-    Address? address,
+    AddressResult? address,
     Observatory? observatory,
     MidCode? midCode,
-    RiseSet? riseSet,
+    SunRiseSet? riseSet,
     UVRays? uvRays,
-    @Default([]) List<Ncst> ncstList,
-    @Default([]) List<Fcst> yesterdayTmpList,
-    @Default([]) List<Fcst> yesterdayPopList,
-    @Default([]) List<Fcst> yesterdaySkyList,
-    @Default([]) List<Fcst> todayTmpList,
-    @Default([]) List<Fcst> todayPopList,
-    @Default([]) List<Fcst> todaySkyList,
-    @Default([]) List<Fcst> tomorrowTmpList,
-    @Default([]) List<Fcst> tomorrowPopList,
-    @Default([]) List<Fcst> tomorrowSkyList,
-    @Default([]) List<Fcst> tmnList,
-    @Default([]) List<Fcst> tmxList,
-    @Default([]) List<Fcst> popList,
-    @Default([]) List<Fcst> skyList,
-    @Default([]) List<Dnsty> dnstyList,
+    @Default([]) List<UltraShortTerm> ultraShortTerm,
+    @Default([]) List<ShortTerm> yesterdayTmpList,
+    @Default([]) List<ShortTerm> yesterdayPopList,
+    @Default([]) List<ShortTerm> yesterdaySkyList,
+    @Default([]) List<ShortTerm> todayTmpList,
+    @Default([]) List<ShortTerm> todayPopList,
+    @Default([]) List<ShortTerm> todaySkyList,
+    @Default([]) List<ShortTerm> tomorrowTmpList,
+    @Default([]) List<ShortTerm> tomorrowPopList,
+    @Default([]) List<ShortTerm> tomorrowSkyList,
+    @Default([]) List<ShortTerm> tmnList,
+    @Default([]) List<ShortTerm> tmxList,
+    @Default([]) List<ShortTerm> popList,
+    @Default([]) List<ShortTerm> skyList,
+    @Default([]) List<FineDust> dnstyList,
     @Default(false) bool isLoading,
     @Default(false) bool isRefresh,
     @Default(0) int errorNum,

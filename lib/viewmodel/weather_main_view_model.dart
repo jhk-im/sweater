@@ -1,12 +1,12 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:sweater/repository/source/remote/model/fcst.dart';
+import 'package:logger/logger.dart';
 import 'package:sweater/repository/weather_repository.dart';
 import 'package:sweater/viewmodel/weather_main_state.dart';
 
 class WeatherMainViewModel with ChangeNotifier {
   final WeatherRepository _repository;
+
+  var logger = Logger();
 
   var _state = const WeatherMainState();
   WeatherMainState get state => _state;
@@ -23,51 +23,26 @@ class WeatherMainViewModel with ChangeNotifier {
 
     // 현재 좌표 주소
     var getAddress = await _repository.getAddressWithCoordinate();
-    getAddress.when(success: (address) async {
-      print(address);
-      _state = state.copyWith(address: address);
+    _state = _state.copyWith(address: getAddress);
+    double longitude = getAddress.x ?? 0;
+    double latitude = getAddress.y ?? 0;
 
-      String depth1 = address.region1depthName ?? '';
-      String depth2 = address.region2depthName ?? '';
-
-      // 중기 예보 지점 코드
-      var getMidCode = await _repository.getMidCode(depth1, depth2);
-      getMidCode.when(success: (midCode) {
-        print(midCode);
-        _state = state.copyWith(midCode: midCode);
-      }, error: (e) {
-        print(e);
-        _state = state.copyWith(
-          errorNum: 3,
-        );
-        notifyListeners();
-      });
-
-      // 관측소 정보
-      var getObservatory =
-          await _repository.getObservatoryWithAddress(depth1, depth2);
-      getObservatory.when(success: (observatory) async {
-        print(observatory);
-        _state = state.copyWith(observatory: observatory);
-      }, error: (e) {
-        print(e);
-        _state = state.copyWith(
-          errorNum: 4,
-        );
-        notifyListeners();
-      });
-
-      getWeatherInfo();
+    // 초단기 실황
+    var getUltraShortTerm =
+    await _repository.getUltraShortTerm(longitude, latitude);
+    getUltraShortTerm.when(success: (ultraShortTerm) {
+      _state = state.copyWith(ultraShortTerm: ultraShortTerm);
     }, error: (e) {
-      print(e);
-      _state = state.copyWith(
-        errorNum: 1,
-      );
-      notifyListeners();
+      logger.e(e);
     });
+
+    _state = state.copyWith(
+      isLoading: false,
+    );
+    notifyListeners();
   }
 
-  Future getWeatherInfo() async {
+  /*Future getWeatherInfo() async {
     double longitude = state.address?.x ?? 0;
     double latitude = state.address?.y ?? 0;
     String depth1 = state.address?.region1depthName ?? '';
@@ -105,31 +80,31 @@ class WeatherMainViewModel with ChangeNotifier {
           .replaceAll(" ", "");
       String yesterday = newDate.substring(0, 8);
 
-      List<Fcst> yesterdayList = [];
+      List<ShortTerm> yesterdayList = [];
       yesterdayList.addAll(yesterdayFcstList
           .where((element) =>
               int.parse(element.fcstDate!) == int.parse(yesterday) &&
                   int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
               int.parse(element.fcstDate!) > int.parse(yesterday))
           .toList());
-      List<Fcst> yesterdayTmpList = [];
+      List<ShortTerm> yesterdayTmpList = [];
       yesterdayTmpList.addAll(yesterdayList
           .where((element) => element.category! == 'TMP')
           .toList());
-      List<Fcst> yesterdaySkyList = [];
+      List<ShortTerm> yesterdaySkyList = [];
       yesterdaySkyList.addAll(yesterdayList
           .where((element) => element.category! == 'SKY')
           .toList());
-      List<Fcst> yesterdayPopList = [];
+      List<ShortTerm> yesterdayPopList = [];
       yesterdayPopList.addAll(yesterdayList
           .where((element) => element.category! == 'POP')
           .toList());
 
-      List<Fcst> tmnList = [];
+      List<ShortTerm> tmnList = [];
       tmnList.addAll(yesterdayFcstList
           .where((element) => element.category! == 'TMN')
           .toList());
-      List<Fcst> tmxList = [];
+      List<ShortTerm> tmxList = [];
       tmxList.addAll(yesterdayFcstList
           .where((element) => element.category! == 'TMX')
           .toList());
@@ -166,37 +141,37 @@ class WeatherMainViewModel with ChangeNotifier {
           .replaceAll(" ", "");
       String tomorrow = tomorrowDate.substring(0, 8);
 
-      List<Fcst> todayList = [];
+      List<ShortTerm> todayList = [];
       todayList.addAll(tomorrowFcstList
           .where((element) =>
               int.parse(element.fcstDate!) == int.parse(today) &&
                   int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
               int.parse(element.fcstDate!) > int.parse(today))
           .toList());
-      List<Fcst> todayTmpList = [];
+      List<ShortTerm> todayTmpList = [];
       todayTmpList.addAll(
           todayList.where((element) => element.category! == 'TMP').toList());
-      List<Fcst> todaySkyList = [];
+      List<ShortTerm> todaySkyList = [];
       todaySkyList.addAll(
           todayList.where((element) => element.category! == 'SKY').toList());
-      List<Fcst> todayPopList = [];
+      List<ShortTerm> todayPopList = [];
       todayPopList.addAll(
           todayList.where((element) => element.category! == 'POP').toList());
 
-      List<Fcst> tomorrowList = [];
+      List<ShortTerm> tomorrowList = [];
       tomorrowList.addAll(tomorrowFcstList
           .where((element) =>
               int.parse(element.fcstDate!) == int.parse(tomorrow) &&
                   int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
               int.parse(element.fcstDate!) > int.parse(tomorrow))
           .toList());
-      List<Fcst> tomorrowTmpList = [];
+      List<ShortTerm> tomorrowTmpList = [];
       tomorrowTmpList.addAll(
           tomorrowList.where((element) => element.category! == 'TMP').toList());
-      List<Fcst> tomorrowSkyList = [];
+      List<ShortTerm> tomorrowSkyList = [];
       tomorrowSkyList.addAll(
           tomorrowList.where((element) => element.category! == 'SKY').toList());
-      List<Fcst> tomorrowPopList = [];
+      List<ShortTerm> tomorrowPopList = [];
       tomorrowPopList.addAll(
           tomorrowList.where((element) => element.category! == 'POP').toList());
 
@@ -208,13 +183,13 @@ class WeatherMainViewModel with ChangeNotifier {
       tmxList.addAll(tomorrowFcstList
           .where((element) => element.category! == 'TMX')
           .toList());
-      List<Fcst> popList = [];
+      List<ShortTerm> popList = [];
       _updatePopList(
           tomorrowFcstList
               .where((element) => element.category! == 'POP')
               .toList(),
           popList);
-      List<Fcst> skyList = [];
+      List<ShortTerm> skyList = [];
       _updateSkyList(
           tomorrowFcstList
               .where((element) => element.category! == 'SKY')
@@ -330,9 +305,9 @@ class WeatherMainViewModel with ChangeNotifier {
     // print('---하늘상태---');
     // print(state.skyList);
     getLifeIndex();
-  }
+  }*/
 
-  Future getLifeIndex() async {
+  /*Future getLifeIndex() async {
     double longitude = state.address?.x ?? 0;
     double latitude = state.address?.y ?? 0;
     String depth2 = state.address?.region2depthName ?? '';
@@ -363,18 +338,18 @@ class WeatherMainViewModel with ChangeNotifier {
       sunrise = int.parse(riseSet.sunrise?.substring(0, 2) ?? '05');
       sunset = int.parse(riseSet.sunset?.substring(0, 2) ?? '19');
 
-      List<Fcst> todayTmpList = state.todayTmpList.sublist(0);
-      List<Fcst> yesterdayTmpList = state.yesterdayTmpList.sublist(0);
-      List<Fcst> tomorrowTmpList = state.tomorrowTmpList.sublist(0);
-      List<Fcst> todaySkyList = state.todaySkyList.sublist(0);
-      List<Fcst> todayPopList = state.todayPopList.sublist(0);
+      List<ShortTerm> todayTmpList = state.todayTmpList.sublist(0);
+      List<ShortTerm> yesterdayTmpList = state.yesterdayTmpList.sublist(0);
+      List<ShortTerm> tomorrowTmpList = state.tomorrowTmpList.sublist(0);
+      List<ShortTerm> todaySkyList = state.todaySkyList.sublist(0);
+      List<ShortTerm> todayPopList = state.todayPopList.sublist(0);
       int count = 0;
       int checkCount = 1;
-      for (Fcst fcst in state.todayTmpList) {
+      for (ShortTerm fcst in state.todayTmpList) {
         final time = int.parse(fcst.fcstTime?.substring(0, 2) ?? '0');
-        Fcst tmnFcst = Fcst();
-        Fcst skyFcst = Fcst();
-        Fcst popFcst = Fcst();
+        ShortTerm tmnFcst = ShortTerm();
+        ShortTerm skyFcst = ShortTerm();
+        ShortTerm popFcst = ShortTerm();
         if (time == sunrise) {
           tmnFcst.fcstTime = '일출';
           tmnFcst.fcstValue = riseSet.sunrise;
@@ -445,11 +420,11 @@ class WeatherMainViewModel with ChangeNotifier {
       isLoading: false,
     );
     notifyListeners();
-  }
+  }*/
 
-  void _updatePopList(List<Fcst> list, List<Fcst> updateList) {
+  /*void _updatePopList(List<ShortTerm> list, List<ShortTerm> updateList) {
     var startDate = '';
-    for (Fcst fcst in list) {
+    for (ShortTerm fcst in list) {
       if (startDate == fcst.fcstDate) {
         if (updateList.isNotEmpty) {
           int value1 = int.parse(updateList.last.fcstValue ?? '0');
@@ -461,12 +436,12 @@ class WeatherMainViewModel with ChangeNotifier {
       }
       startDate = fcst.fcstDate ?? '';
     }
-  }
+  }*/
 
-  void _updateSkyList(List<Fcst> list, List<Fcst> updateList) {
+  /*void _updateSkyList(List<ShortTerm> list, List<ShortTerm> updateList) {
     var startDate = '';
     List<String> values = [];
-    for (Fcst fcst in list) {
+    for (ShortTerm fcst in list) {
       if (startDate == fcst.fcstDate) {
         if (updateList.isNotEmpty) {
           values.add(fcst.fcstValue ?? '');
@@ -484,7 +459,7 @@ class WeatherMainViewModel with ChangeNotifier {
           if (value4 > value3 && value4 > value1) {
             value = '4';
           }
-          Fcst updateFcst = updateList[updateList.length - 1];
+          ShortTerm updateFcst = updateList[updateList.length - 1];
           updateFcst.fcstValue =
               fcst.weatherCategory?.codeValues?[int.parse(value)];
           //print(updateFcst);
@@ -494,13 +469,13 @@ class WeatherMainViewModel with ChangeNotifier {
       }
       startDate = fcst.fcstDate ?? '';
     }
-    Fcst last = updateList.last;
+    ShortTerm last = updateList.last;
     last.fcstValue =
         last.weatherCategory?.codeValues?[int.parse(last.fcstValue ?? '')];
-  }
+  }*/
 
-  Fcst _createFcst(Fcst last, value) {
-    Fcst fcst = Fcst();
+  /*ShortTerm _createFcst(ShortTerm last, value) {
+    ShortTerm fcst = ShortTerm();
     fcst.category = last.category;
     fcst.weatherCategory = last.weatherCategory;
     fcst.baseTime = last.baseTime;
@@ -516,5 +491,5 @@ class WeatherMainViewModel with ChangeNotifier {
     fcst.fcstDate = newDate.substring(0, 8);
     fcst.fcstValue = '$value';
     return fcst;
-  }
+  }*/
 }

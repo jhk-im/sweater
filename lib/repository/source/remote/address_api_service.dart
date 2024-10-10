@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:sweater/repository/source/remote/model/address_response.dart';
 
@@ -13,6 +12,5 @@ abstract class AddressApiService {
 
   @GET("/v2/local/geo/coord2regioncode.json")
   Future<AddressResponse> getAddressWithCoordinate(
-      @Query('x') double x,
-      @Query('y') double y,);
+      @Query('x') double x, @Query('y') double y);
 }

@@ -1,7 +1,7 @@
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 
 // 예보 조회
-class Fcst {
+class ShortTerm {
   String? baseDate;
   String? baseTime;
   String? category;
@@ -12,7 +12,7 @@ class Fcst {
   int? ny;
   WeatherCategory? weatherCategory;
 
-  Fcst(
+  ShortTerm(
       {this.baseDate,
       this.baseTime,
       this.category,
@@ -22,7 +22,7 @@ class Fcst {
       this.nx,
       this.ny});
 
-  Fcst.fromJson(Map<String, dynamic> json) {
+  ShortTerm.fromJson(Map<String, dynamic> json) {
     baseDate = json['baseDate'];
     baseTime = json['baseTime'];
     category = json['category'];
@@ -48,26 +48,26 @@ class Fcst {
 
   @override
   String toString() {
-    return 'Fcst: { $weatherCategory, fcstValue: $fcstValue,  category: $category, nx: $nx, ny: $ny, fcstDate: $fcstDate, fcstTime: $fcstTime, baseDate: $baseDate, baseTime: $baseTime }';
+    return 'ShortTerm: { $weatherCategory, fcstValue: $fcstValue,  category: $category, nx: $nx, ny: $ny, fcstDate: $fcstDate, fcstTime: $fcstTime, baseDate: $baseDate, baseTime: $baseTime }';
   }
 }
 
 // 초단기 예보 조회, 단기 예보 조회
-class FcstList {
+class ShortTermList {
   String? dataType;
   Items? items;
   int? pageNo;
   int? numOfRows;
   int? totalCount;
 
-  FcstList(
+  ShortTermList(
       {this.dataType,
         this.items,
         this.pageNo,
         this.numOfRows,
         this.totalCount});
 
-  FcstList.fromJson(Map<String, dynamic> json) {
+  ShortTermList.fromJson(Map<String, dynamic> json) {
     dataType = json['dataType'];
     items = json['items'] != null ? Items.fromJson(json['items']) : null;
     pageNo = json['pageNo'];
@@ -89,15 +89,15 @@ class FcstList {
 }
 
 class Items {
-  List<Fcst>? item;
+  List<ShortTerm>? item;
 
   Items({this.item});
 
   Items.fromJson(Map<String, dynamic> json) {
     if (json['item'] != null) {
-      item = <Fcst>[];
+      item = <ShortTerm>[];
       json['item'].forEach((v) {
-        item!.add(Fcst.fromJson(v));
+        item!.add(ShortTerm.fromJson(v));
       });
     }
   }

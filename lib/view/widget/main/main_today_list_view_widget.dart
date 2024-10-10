@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sweater/repository/source/remote/model/fcst.dart';
+import 'package:sweater/repository/source/remote/model/short_term.dart';
 import 'package:sweater/utils/images.dart';
 import 'package:sweater/utils/text_styles.dart';
 import 'package:sweater/viewmodel/weather_main_state.dart';
@@ -77,7 +77,7 @@ class MainTodayListViewWidget extends StatelessWidget {
     );
   }
 
-  String _getPrecipitation(List<Fcst> popList, int index) {
+  String _getPrecipitation(List<ShortTerm> popList, int index) {
     final fcstValue =
     popList.isNotEmpty ? popList[index].fcstValue ?? '' : '';
     if (fcstValue == '0') {
@@ -87,7 +87,7 @@ class MainTodayListViewWidget extends StatelessWidget {
     }
   }
 
-  String _getSkyStatus(List<Fcst> skyList, int index) {
+  String _getSkyStatus(List<ShortTerm> skyList, int index) {
     final time = int.parse(skyList.isNotEmpty ? skyList[index].fcstTime?.substring(0, 2) ?? '0' : '0');
 
     int sunrise = 5;

@@ -1,4 +1,4 @@
-class Dnsty {
+class FineDust {
   String? so2Grade;
   String? coFlag;
   String? khaiValue;
@@ -21,7 +21,7 @@ class Dnsty {
   String? pm10Grade;
   String? o3Value;
 
-  Dnsty(
+  FineDust(
       {this.so2Grade,
         this.coFlag,
         this.khaiValue,
@@ -44,7 +44,7 @@ class Dnsty {
         this.pm10Grade,
         this.o3Value});
 
-  Dnsty.fromJson(Map<String, dynamic> json) {
+  FineDust.fromJson(Map<String, dynamic> json) {
     so2Grade = json['so2Grade'];
     coFlag = json['coFlag'];
     khaiValue = json['khaiValue'];
@@ -96,25 +96,25 @@ class Dnsty {
 
   @override
   String toString() {
-    return 'Dnsty: { 미세먼지: $pm10Value, 미세먼지24시간: $pm10Value24, 초미세먼지: $pm25Value, 초미세먼지24시간: $pm25Value24, dateTime: $dataTime }';
+    return 'FineDust: { 미세먼지: $pm10Value, 미세먼지24시간: $pm10Value24, 초미세먼지: $pm25Value, 초미세먼지24시간: $pm25Value24, dateTime: $dataTime }';
   }
 }
 
 
-class DnstyList {
+class FineDustList {
   int? totalCount;
-  List<Dnsty>? items;
+  List<FineDust>? items;
   int? pageNo;
   int? numOfRows;
 
-  DnstyList({this.totalCount, this.items, this.pageNo, this.numOfRows});
+  FineDustList({this.totalCount, this.items, this.pageNo, this.numOfRows});
 
-  DnstyList.fromJson(Map<String, dynamic> json) {
+  FineDustList.fromJson(Map<String, dynamic> json) {
     totalCount = json['totalCount'];
     if (json['items'] != null) {
-      items = <Dnsty>[];
+      items = <FineDust>[];
       json['items'].forEach((v) {
-        items!.add(Dnsty.fromJson(v));
+        items!.add(FineDust.fromJson(v));
       });
     }
     pageNo = json['pageNo'];

@@ -85,21 +85,21 @@ class MidTermTemperature {
   }
 }
 
-class MidTaList {
+class MidTermTemperatureList {
   String? dataType;
   Items? items;
   int? pageNo;
   int? numOfRows;
   int? totalCount;
 
-  MidTaList(
+  MidTermTemperatureList(
       {this.dataType,
         this.items,
         this.pageNo,
         this.numOfRows,
         this.totalCount});
 
-  MidTaList.fromJson(Map<String, dynamic> json) {
+  MidTermTemperatureList.fromJson(Map<String, dynamic> json) {
     dataType = json['dataType'];
     items = json['items'] != null ? Items.fromJson(json['items']) : null;
     pageNo = json['pageNo'];

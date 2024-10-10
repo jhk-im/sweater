@@ -125,8 +125,8 @@ class MainGridViewWidget extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  state.ncstList.isNotEmpty
-                      ? '${state.ncstList.where((element) => element.category == 'REH').toList()[0].obsrValue}%'
+                  state.ultraShortTerm.isNotEmpty
+                      ? '${state.ultraShortTerm.where((element) => element.category == 'REH').toList()[0].obsrValue}%'
                       : '',
                   style: caption(context, 0.5),
                 ),
@@ -154,8 +154,8 @@ class MainGridViewWidget extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  state.ncstList.isNotEmpty
-                      ? '${state.ncstList.where((element) => element.category == 'WSD').toList()[0].obsrValue}m/s'
+                  state.ultraShortTerm.isNotEmpty
+                      ? '${state.ultraShortTerm.where((element) => element.category == 'WSD').toList()[0].obsrValue}m/s'
                       : '',
                   style: caption(context, 0.5),
                 ),

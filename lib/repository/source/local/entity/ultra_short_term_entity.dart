@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'ncst_entity.g.dart';
+part 'ultra_short_term_entity.g.dart';
 
 @HiveType(typeId: 0)
-class NcstEntity extends HiveObject {
+class UltraShortTermEntity extends HiveObject {
   @HiveField(0)
   String category;
   @HiveField(1)
@@ -22,5 +22,5 @@ class NcstEntity extends HiveObject {
   int? nx;
   @HiveField(8)
   int? ny;
-  NcstEntity({required this.category, required this.obsrValue,});
+  UltraShortTermEntity({required this.category, required this.obsrValue});
 }
