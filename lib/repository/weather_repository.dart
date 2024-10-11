@@ -10,6 +10,7 @@ import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/mapper/weather_mapper.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
 import 'package:sweater/repository/source/remote/weather_api_service.dart';
+import 'package:sweater/utils/constants.dart';
 import 'package:sweater/utils/convert_gps.dart';
 import 'package:sweater/repository/source/remote/result/result.dart';
 
@@ -22,6 +23,7 @@ class WeatherRepository {
 
   var logger = Logger();
 
+  // 현재 위치 좌표
   Future<Position> _getLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -117,8 +119,8 @@ class WeatherRepository {
   }
 
   // 초단기 실황
-  Future<Result<List<WeatherItem>>> getUltraShortTerm(double longitude, double latitude) async {
-    final localList = await _dao.getAllUltraShortTermList();
+  Future<Result<List<WeatherItem>>> getUltraShortTermLive(double longitude, double latitude) async {
+    final localList = await _dao.getAllUltraShortTermLiveList();
 
     // 30분 전
     DateTime dateTime = DateTime.now();
@@ -138,7 +140,7 @@ class WeatherRepository {
         String localDate = localList[0].baseDate ?? '';
         if (date == localDate) {
           if (checkTime == localTime) {
-            logger.d('getUltraShortTerm() -> local return $localList');
+            logger.d('getUltraShortTermLive -> local return');
             return Result.success(localList.map((e) => e.toUltraShortTermEntity()).toList());
           }
         }
@@ -153,7 +155,7 @@ class WeatherRepository {
     // remote
     try {
       final response =
-      await _weatherApiService.getUltraShortTerm('10', '1', date, time, x, y);
+      await _weatherApiService.getUltraShortTermLive('10', '1', date, time, x, y);
       if (response.response.body?.items?.item != null) {
         List<WeatherItem> result = [];
         for (var item in response.response.body!.items!.item!) {
@@ -161,16 +163,136 @@ class WeatherRepository {
           result.add(item);
         }
         if (result.isNotEmpty) {
-          _dao.clearUltraShortTermList();
-          _dao.insertUltraShortTermList(result.map((e) => e.toWeatherItemEntity()).toList());
+          _dao.clearUltraShortTermLiveList();
+          _dao.insertUltraShortTermLiveList(result.map((e) => e.toWeatherItemEntity()).toList());
         }
-        logger.d('getUltraShortTerm() -> api return $result');
+        logger.d('getUltraShortTermLive -> api return');
         return Result.success(result);
       } else {
-        return Result.error(Exception('getUltraShortTerm failed: null'));
+        return Result.error(Exception('getUltraShortTermLive failed: null'));
       }
     } catch (e) {
-      return Result.error(Exception('getUltraShortTerm failed: ${e.toString()}'));
+      return Result.error(Exception('getUltraShortTermLive failed: ${e.toString()}'));
+    }
+  }
+
+  // 오늘(내일, 모레) 단기 예보
+  Future<Result<List<WeatherItem>>> getTodayShortTerm(double longitude, double latitude) async {
+    final localList = await _dao.getAllTodayShortTermList();
+
+    DateTime dateTime = DateTime.now();
+    String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
+        dateTime.hour, dateTime.minute - 30)
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String date = dt.substring(0, 8);
+    String checkTime = dt.substring(8, 10);
+    int checkTimeIndex = int.parse(checkTime);
+    String time = kBaseTimeList[checkTimeIndex];
+
+    // local
+    if (localList.isNotEmpty) {
+      if (localList[0].baseTime != null) {
+        String localTime = localList[0].baseTime!.substring(0, 2);
+        String callTime = time.substring(0, 2);
+        String localDate = localList[0].baseDate ?? '';
+        if (date == localDate) {
+          if (callTime == localTime) {
+            logger.d('getTodayShortTerm -> local return');
+            return Result.success(localList.map((e) => e.toUltraShortTermEntity()).toList());
+          }
+        }
+      }
+    }
+
+    // get location
+    var gpsToData = ConvertGps.gpsToGRID(latitude, longitude);
+    int x = gpsToData['x'];
+    int y = gpsToData['y'];
+
+    // remote
+    try {
+      final response =
+      await _weatherApiService.getShortTerm('1000', '1', date, time, x, y);
+      if (response.response.body?.items?.item != null) {
+        List<WeatherItem> result = [];
+        for (var item in response.response.body!.items!.item!) {
+          item.weatherCategory = await _getWeatherCode(item.category ?? '');
+          result.add(item);
+        }
+        if (result.isNotEmpty) {
+          _dao.clearTodayShortTermList();
+          _dao.insertTodayShortTermList(result.map((e) => e.toWeatherItemEntity()).toList());
+        }
+        logger.d('getTodayShortTerm -> api return');
+        return Result.success(result);
+      } else {
+        return Result.error(Exception('getTodayShortTerm failed: null'));
+      }
+    } catch (e) {
+      return Result.error(Exception('getTodayShortTerm failed: ${e.toString()}'));
+    }
+  }
+
+  // 어제 단기 예보
+  Future<Result<List<WeatherItem>>> getYesterdayShortTerm(double longitude, double latitude) async {
+    final localList = await _dao.getAllYesterdayShortTermList();
+
+    DateTime dateTime = DateTime.now();
+    int day = dateTime.day;
+    if (dateTime.hour == 23 || dateTime.hour < 3) {
+      day -= 1;
+    }
+    String dt = DateTime(dateTime.year, dateTime.month, day,
+        dateTime.hour, dateTime.minute - 30)
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String date = dt.substring(0, 8);
+    String time = '0200';
+
+    // local
+    if (localList.isNotEmpty) {
+      if (localList[0].baseTime != null) {
+        String localTime = localList[0].baseTime!.substring(0, 2);
+        String callTime = time.substring(0, 2);
+        String localDate = localList[0].baseDate ?? '';
+        if (date == localDate) {
+          if (callTime == localTime) {
+            logger.d('getYesterdayShortTerm -> local return');
+            return Result.success(localList.map((e) => e.toUltraShortTermEntity()).toList());
+          }
+        }
+      }
+    }
+
+    // get location
+    var gpsToData = ConvertGps.gpsToGRID(latitude, longitude);
+    int x = gpsToData['x'];
+    int y = gpsToData['y'];
+
+    // remote
+    try {
+      final response =
+      await _weatherApiService.getShortTerm('600', '1', date, time, x, y);
+      if (response.response.body?.items?.item != null) {
+        List<WeatherItem> result = [];
+        for (var item in response.response.body!.items!.item!) {
+          item.weatherCategory = await _getWeatherCode(item.category ?? '');
+          result.add(item);
+        }
+        if (result.isNotEmpty) {
+          _dao.clearYesterdayShortTermList();
+          _dao.insertYesterdayShortTermList(result.map((e) => e.toWeatherItemEntity()).toList());
+        }
+        logger.d('getYesterdayShortTerm -> api return');
+        return Result.success(result);
+      } else {
+        return Result.error(Exception('getYesterdayShortTerm failed: null'));
+      }
+    } catch (e) {
+      return Result.error(Exception('getYesterdayShortTerm failed: ${e.toString()}'));
     }
   }
 

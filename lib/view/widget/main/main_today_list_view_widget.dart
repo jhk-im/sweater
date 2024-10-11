@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sweater/repository/source/remote/model/short_term.dart';
+import 'package:sweater/repository/source/remote/model/weather_response.dart';
 import 'package:sweater/utils/images.dart';
 import 'package:sweater/utils/text_styles.dart';
 import 'package:sweater/viewmodel/weather_main_state.dart';
@@ -36,7 +36,7 @@ class MainTodayListViewWidget extends StatelessWidget {
                         ),
                         if (_getSkyStatus(state.todaySkyList, index).isNotEmpty)
                           pngIcon(_getSkyStatus(state.todaySkyList, index),
-                            Theme.of(context).colorScheme.onBackground,
+                            Theme.of(context).colorScheme.surface,
                               width: 18, height: 18),
                         Text(
                           state.yesterdayTmpList.isNotEmpty && !state.yesterdayTmpList[index].fcstTime!.contains('일')
@@ -61,7 +61,7 @@ class MainTodayListViewWidget extends StatelessWidget {
                           children: [
                             if (_getPrecipitation(state.todayPopList, index).isNotEmpty)
                             pngIcon('rainy.png',
-                                Theme.of(context).colorScheme.onBackground,
+                                Theme.of(context).colorScheme.surface,
                                 width: 14, height: 14),
                             Text(_getPrecipitation(state.todayPopList, index),
                                 style: caption3(context, 1.0),),
@@ -77,7 +77,7 @@ class MainTodayListViewWidget extends StatelessWidget {
     );
   }
 
-  String _getPrecipitation(List<ShortTerm> popList, int index) {
+  String _getPrecipitation(List<WeatherItem> popList, int index) {
     final fcstValue =
     popList.isNotEmpty ? popList[index].fcstValue ?? '' : '';
     if (fcstValue == '0') {
@@ -87,7 +87,7 @@ class MainTodayListViewWidget extends StatelessWidget {
     }
   }
 
-  String _getSkyStatus(List<ShortTerm> skyList, int index) {
+  String _getSkyStatus(List<WeatherItem> skyList, int index) {
     final time = int.parse(skyList.isNotEmpty ? skyList[index].fcstTime?.substring(0, 2) ?? '0' : '0');
 
     int sunrise = 5;

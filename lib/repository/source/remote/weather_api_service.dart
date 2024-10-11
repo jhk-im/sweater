@@ -13,7 +13,7 @@ abstract class WeatherApiService {
   }
 
   @GET("/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst")
-  Future<WeatherResponse> getUltraShortTerm(
+  Future<WeatherResponse> getUltraShortTermLive(
       @Query('numOfRows') String numOfRows,
       @Query('pageNo') String pageNo,
       @Query('base_date') String date,
@@ -21,7 +21,7 @@ abstract class WeatherApiService {
       @Query('nx') int x,
       @Query('ny') int y);
 
-  @GET("/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst")
+  @GET("/1360000/VilageFcstInfoService_2.0/getVilageFcst")
   Future<WeatherResponse> getShortTerm(
       @Query('numOfRows') String numOfRows,
       @Query('pageNo') String pageNo,

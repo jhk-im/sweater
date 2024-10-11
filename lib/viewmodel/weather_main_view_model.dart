@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:sweater/repository/source/remote/model/weather_response.dart';
 import 'package:sweater/repository/weather_repository.dart';
 import 'package:sweater/viewmodel/weather_main_state.dart';
 
@@ -29,9 +32,106 @@ class WeatherMainViewModel with ChangeNotifier {
 
     // 초단기 실황
     var getUltraShortTerm =
-    await _repository.getUltraShortTerm(longitude, latitude);
+    await _repository.getUltraShortTermLive(longitude, latitude);
     getUltraShortTerm.when(success: (ultraShortTerm) {
       _state = state.copyWith(ultraShortTerm: ultraShortTerm);
+    }, error: (e) {
+      logger.e(e);
+    });
+
+    // 오늘(내일, 모레) 예보
+    var getTodayShortTerm =
+    await _repository.getTodayShortTerm(longitude, latitude);
+    getTodayShortTerm.when(success: (todayShortTerm) {
+      final date = DateTime.now();
+      final todayDate = date
+          .toString()
+          .replaceAll(RegExp("[^0-9\\s]"), "")
+          .replaceAll(" ", "");
+      String today = todayDate.substring(0, 8);
+      int todayTime = int.parse(todayDate.substring(8, 10));
+      final tomorrowDate = DateTime(date.year, date.month, date.day + 1)
+          .toString()
+          .replaceAll(RegExp("[^0-9\\s]"), "")
+          .replaceAll(" ", "");
+      String tomorrow = tomorrowDate.substring(0, 8);
+      List<WeatherItem> todayList = [];
+      todayList.addAll(todayShortTerm
+          .where((element) =>
+          int.parse(element.fcstDate!) == int.parse(today) &&
+          int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
+          int.parse(element.fcstDate!) > int.parse(today))
+          .toList());
+      List<WeatherItem> todayTmpList = [];
+      todayTmpList.addAll(
+          todayList.where((element) => element.category! == 'TMP').toList());
+      List<WeatherItem> todaySkyList = [];
+      todaySkyList.addAll(
+          todayList.where((element) => element.category! == 'SKY').toList());
+      List<WeatherItem> todayPopList = [];
+      todayPopList.addAll(
+          todayList.where((element) => element.category! == 'POP').toList());
+
+      List<WeatherItem> tomorrowList = [];
+      tomorrowList.addAll(todayShortTerm
+          .where((element) =>
+      int.parse(element.fcstDate!) == int.parse(tomorrow) &&
+          int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
+          int.parse(element.fcstDate!) > int.parse(tomorrow))
+          .toList());
+      List<WeatherItem> tomorrowTmpList = [];
+      tomorrowTmpList.addAll(
+          tomorrowList.where((element) => element.category! == 'TMP').toList());
+      List<WeatherItem> tomorrowSkyList = [];
+      tomorrowSkyList.addAll(
+          tomorrowList.where((element) => element.category! == 'SKY').toList());
+      List<WeatherItem> tomorrowPopList = [];
+      tomorrowPopList.addAll(
+          tomorrowList.where((element) => element.category! == 'POP').toList());
+
+      final tmnList = state.tmnList.sublist(0);
+      tmnList.addAll(todayShortTerm
+          .where((element) => element.category! == 'TMN')
+          .toList());
+      final tmxList = state.tmxList.sublist(0);
+      tmxList.addAll(todayShortTerm
+          .where((element) => element.category! == 'TMX')
+          .toList());
+      List<WeatherItem> popList = [];
+      _updatePopList(
+          todayShortTerm
+              .where((element) => element.category! == 'POP')
+              .toList(),
+          popList);
+      List<WeatherItem> skyList = [];
+      _updateSkyList(
+          todayShortTerm
+              .where((element) => element.category! == 'SKY')
+              .toList(),
+          skyList);
+      _state = state.copyWith(
+        todayTmpList: todayTmpList,
+        todayPopList: todayPopList,
+        todaySkyList: todaySkyList,
+        tomorrowTmpList: tomorrowTmpList,
+        tomorrowPopList: tomorrowPopList,
+        tomorrowSkyList: tomorrowSkyList,
+        tmnList: tmnList,
+        tmxList: tmxList,
+        popList: popList,
+        skyList: skyList,
+      );
+    }, error: (e) {
+      logger.e(e);
+    });
+
+    // 어제 예보
+    var getYesterdayShortTerm =
+    await _repository.getYesterdayShortTerm(longitude, latitude);
+    getYesterdayShortTerm.when(success: (yesterdayShortTerm) {
+      _state = state.copyWith(yesterdayTmpList: yesterdayShortTerm.where((element) => element.category! == 'TMP').toList());
+      _state = state.copyWith(yesterdaySkyList: yesterdayShortTerm.where((element) => element.category! == 'SKY').toList());
+      _state = state.copyWith(yesterdayPopList: yesterdayShortTerm.where((element) => element.category! == 'POP').toList());
     }, error: (e) {
       logger.e(e);
     });
@@ -422,29 +522,29 @@ class WeatherMainViewModel with ChangeNotifier {
     notifyListeners();
   }*/
 
-  /*void _updatePopList(List<ShortTerm> list, List<ShortTerm> updateList) {
+  void _updatePopList(List<WeatherItem> list, List<WeatherItem> updateList) {
     var startDate = '';
-    for (ShortTerm fcst in list) {
-      if (startDate == fcst.fcstDate) {
+    for (WeatherItem item in list) {
+      if (startDate == item.fcstDate) {
         if (updateList.isNotEmpty) {
           int value1 = int.parse(updateList.last.fcstValue ?? '0');
-          int value2 = int.parse(fcst.fcstValue ?? '0');
+          int value2 = int.parse(item.fcstValue ?? '0');
           updateList.last.fcstValue = max(value1, value2).toString();
         }
       } else {
-        updateList.add(fcst);
+        updateList.add(item);
       }
-      startDate = fcst.fcstDate ?? '';
+      startDate = item.fcstDate ?? '';
     }
-  }*/
+  }
 
-  /*void _updateSkyList(List<ShortTerm> list, List<ShortTerm> updateList) {
+  void _updateSkyList(List<WeatherItem> list, List<WeatherItem> updateList) {
     var startDate = '';
     List<String> values = [];
-    for (ShortTerm fcst in list) {
-      if (startDate == fcst.fcstDate) {
+    for (WeatherItem item in list) {
+      if (startDate == item.fcstDate) {
         if (updateList.isNotEmpty) {
-          values.add(fcst.fcstValue ?? '');
+          values.add(item.fcstValue ?? '');
         }
       } else {
         if (updateList.isNotEmpty) {
@@ -452,27 +552,23 @@ class WeatherMainViewModel with ChangeNotifier {
           int value1 = values.where((element) => element == '1').length;
           int value3 = values.where((element) => element == '3').length;
           int value4 = values.where((element) => element == '4').length;
-          //print('$value1, $value3, $value4');
           if (value1 > value3 && value1 > value4) {
             value = '1';
           }
           if (value4 > value3 && value4 > value1) {
             value = '4';
           }
-          ShortTerm updateFcst = updateList[updateList.length - 1];
-          updateFcst.fcstValue =
-              fcst.weatherCategory?.codeValues?[int.parse(value)];
-          //print(updateFcst);
+          WeatherItem item = updateList[updateList.length - 1];
+          item.fcstValue = item.weatherCategory?.codeValues?[int.parse(value)];
           values.clear();
         }
-        updateList.add(fcst);
+        updateList.add(item);
       }
-      startDate = fcst.fcstDate ?? '';
+      startDate = item.fcstDate ?? '';
     }
-    ShortTerm last = updateList.last;
-    last.fcstValue =
-        last.weatherCategory?.codeValues?[int.parse(last.fcstValue ?? '')];
-  }*/
+    WeatherItem last = updateList.last;
+    last.fcstValue = last.weatherCategory?.codeValues?[int.parse(last.fcstValue ?? '')];
+  }
 
   /*ShortTerm _createFcst(ShortTerm last, value) {
     ShortTerm fcst = ShortTerm();

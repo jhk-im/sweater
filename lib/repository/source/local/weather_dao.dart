@@ -11,7 +11,7 @@ import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
 import 'package:sweater/repository/source/local/entity/uv_rays_entity.dart';
 
 class WeatherDao {
-  static const observatory = 'observatory';
+  /*static const observatory = 'observatory';
   Future<void> insertObservatoryList(List<ObservatoryEntity> list) async {
     final box = await Hive.openBox<ObservatoryEntity>(observatory);
     await box.addAll(list);
@@ -75,26 +75,7 @@ class WeatherDao {
     return box.values.toList();
   }
 
-  static const userAddress = 'userAddress';
-  Future<void> insertAddress(AddressEntity address) async {
-    final box = await Hive.openBox<AddressEntity>(userAddress);
-    await box.add(address);
-  }
 
-  Future<void> updateAddress(AddressEntity address) async {
-    final box = await Hive.openBox<AddressEntity>(userAddress);
-    await box.put(address.code, address);
-  }
-
-  Future clearAddress() async {
-    final box = await Hive.openBox<AddressEntity>(userAddress);
-    await box.clear();
-  }
-
-  Future<List<AddressEntity>> getAllAddressList() async {
-    final box = await Hive.openBox<AddressEntity>(userAddress);
-    return box.values.toList();
-  }
 
   static const riseSet = 'riseSet';
   Future<void> insertRiseInfo(RiseSetEntity entity) async {
@@ -174,21 +155,74 @@ class WeatherDao {
       final box = await Hive.openBox<FcstEntity>(prevVilageFcst);
       return box.values.toList();
     }
+  }*/
+
+  static const userAddress = 'userAddress';
+  Future<void> insertAddress(AddressEntity address) async {
+    final box = await Hive.openBox<AddressEntity>(userAddress);
+    await box.add(address);
   }
 
-  static const ultraShortTerm = 'ultraShortTerm';
-  Future<void> insertUltraShortTermList(List<WeatherItemEntity> weatherItemEntity) async {
-    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTerm);
-    await box.addAll(weatherItemEntity);
+  Future<void> updateAddress(AddressEntity address) async {
+    final box = await Hive.openBox<AddressEntity>(userAddress);
+    await box.put(address.code, address);
   }
 
-  Future clearUltraShortTermList() async {
-    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTerm);
+  Future clearAddress() async {
+    final box = await Hive.openBox<AddressEntity>(userAddress);
     await box.clear();
   }
 
-  Future<List<WeatherItemEntity>> getAllUltraShortTermList() async {
-    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTerm);
+  Future<List<AddressEntity>> getAllAddressList() async {
+    final box = await Hive.openBox<AddressEntity>(userAddress);
+    return box.values.toList();
+  }
+
+  static const ultraShortTermLive = 'ultraShortTermLive';
+  Future<void> insertUltraShortTermLiveList(List<WeatherItemEntity> weatherItemEntity) async {
+    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTermLive);
+    await box.addAll(weatherItemEntity);
+  }
+
+  Future clearUltraShortTermLiveList() async {
+    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTermLive);
+    await box.clear();
+  }
+
+  Future<List<WeatherItemEntity>> getAllUltraShortTermLiveList() async {
+    final box = await Hive.openBox<WeatherItemEntity>(ultraShortTermLive);
+    return box.values.toList();
+  }
+
+  static const todayShortTerm = 'todayShortTerm';
+  Future<void> insertTodayShortTermList(List<WeatherItemEntity> weatherItemEntity) async {
+    final box = await Hive.openBox<WeatherItemEntity>(todayShortTerm);
+    await box.addAll(weatherItemEntity);
+  }
+
+  Future clearTodayShortTermList() async {
+    final box = await Hive.openBox<WeatherItemEntity>(todayShortTerm);
+    await box.clear();
+  }
+
+  Future<List<WeatherItemEntity>> getAllTodayShortTermList() async {
+    final box = await Hive.openBox<WeatherItemEntity>(todayShortTerm);
+    return box.values.toList();
+  }
+
+  static const yesterdayShortTerm = 'yesterdayShortTerm';
+  Future<void> insertYesterdayShortTermList(List<WeatherItemEntity> weatherItemEntity) async {
+    final box = await Hive.openBox<WeatherItemEntity>(yesterdayShortTerm);
+    await box.addAll(weatherItemEntity);
+  }
+
+  Future clearYesterdayShortTermList() async {
+    final box = await Hive.openBox<WeatherItemEntity>(yesterdayShortTerm);
+    await box.clear();
+  }
+
+  Future<List<WeatherItemEntity>> getAllYesterdayShortTermList() async {
+    final box = await Hive.openBox<WeatherItemEntity>(yesterdayShortTerm);
     return box.values.toList();
   }
 

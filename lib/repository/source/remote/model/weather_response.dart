@@ -90,24 +90,24 @@ class WeatherItem {
   final String? baseDate;
   final String? baseTime;
   final String? category;
-  final String? fcstDate;
-  final String? fcstTime;
-  final String? fcstValue;
   final int? nx;
   final int? ny;
   final String? obsrValue;
+  final String? fcstDate;
+  final String? fcstTime;
+  String? fcstValue;
   WeatherCategory? weatherCategory;
 
   WeatherItem({
     this.baseDate,
     this.baseTime,
     this.category,
-    this.fcstDate,
-    this.fcstTime,
-    this.fcstValue,
     this.nx,
     this.ny,
     this.obsrValue,
+    this.fcstDate,
+    this.fcstTime,
+    this.fcstValue,
   });
 
   factory WeatherItem.fromJson(Map<String, dynamic> json) =>

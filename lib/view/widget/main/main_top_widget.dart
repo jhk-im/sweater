@@ -53,7 +53,7 @@ class _MainTopWidgetState extends State<MainTopWidget> {
               ),
             if (!widget.isScrollDown)
               Text(
-                '${_getTemperatureFromFcst(widget.state.tmnList)} / ${_getTemperatureFromFcst(widget.state.tmxList)}',
+                '${_getTemperature(widget.state.tmnList)} / ${_getTemperature(widget.state.tmxList)}',
                 style: body(context),
               ),
             if (widget.isScrollDown)
@@ -72,10 +72,10 @@ class _MainTopWidgetState extends State<MainTopWidget> {
     );
   }
 
-  String _getTemperatureFromFcst(List<ShortTerm> fcstList) {
-    if (fcstList.isNotEmpty) {
-      ShortTerm fcst = fcstList[0];
-      return '${fcst.fcstValue?.substring(0, fcst.fcstValue!.length - 2) ?? ''}°';
+  String _getTemperature(List<WeatherItem> list) {
+    if (list.isNotEmpty) {
+      WeatherItem item = list[0];
+      return '${item.fcstValue?.substring(0, item.fcstValue!.length - 2) ?? ''}°';
     }
     return '';
   }
