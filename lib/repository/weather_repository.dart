@@ -3,8 +3,17 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
+import 'package:sweater/repository/source/local/csv/mid_code_parser.dart';
+import 'package:sweater/repository/source/local/csv/observatory_parser.dart';
 import 'package:sweater/repository/source/remote/address_api_service.dart';
 import 'package:sweater/repository/source/remote/model/address_response.dart';
+import 'package:sweater/repository/source/remote/model/fine_dust_response.dart';
+import 'package:sweater/repository/source/remote/model/mid_code.dart';
+import 'package:sweater/repository/source/remote/model/mid_term_land_response.dart';
+import 'package:sweater/repository/source/remote/model/mid_term_temperature_response.dart';
+import 'package:sweater/repository/source/remote/model/observatory.dart';
+import 'package:sweater/repository/source/remote/model/sun_rise_response.dart';
+import 'package:sweater/repository/source/remote/model/ultraviolet_response.dart';
 import 'package:sweater/repository/source/remote/model/weather_response.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/mapper/weather_mapper.dart';
@@ -13,10 +22,11 @@ import 'package:sweater/repository/source/remote/weather_api_service.dart';
 import 'package:sweater/utils/constants.dart';
 import 'package:sweater/utils/convert_gps.dart';
 import 'package:sweater/repository/source/remote/result/result.dart';
+import 'package:xml2json/xml2json.dart';
 
 class WeatherRepository {
-  final WeatherApiService _weatherApiService;
   final AddressApiService _addressApi;
+  final WeatherApiService _weatherApiService;
   final WeatherDao _dao;
 
   WeatherRepository(this._addressApi, this._weatherApiService, this._dao);
@@ -58,7 +68,8 @@ class WeatherRepository {
     if (permission == LocationPermission.deniedForever) {
       return defaultPosition;
     }
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
 
   // 날씨 category 정보
@@ -82,7 +93,8 @@ class WeatherRepository {
       final currentY = localList.first.y!.toStringAsFixed(3);
       final positionY = position.latitude.toStringAsFixed(3);
       if (currentX == positionX && currentY == positionY) {
-        logger.d('getAddressWithCoordinate() local return ${localList.first.toAddress().addressName}');
+        logger.d(
+            'getAddressWithCoordinate() local return ${localList.first.toAddress().addressName}');
         return localList.first.toAddress();
       }
     }
@@ -95,7 +107,8 @@ class WeatherRepository {
         final address = response.documents!.first;
         _dao.clearAddress();
         _dao.insertAddress(address.toAddressEntity());
-        logger.d('getAddressWithCoordinate() api return ${address.addressName}');
+        logger
+            .d('getAddressWithCoordinate() api return ${address.addressName}');
         return address;
       }
     } catch (e) {
@@ -119,13 +132,14 @@ class WeatherRepository {
   }
 
   // 초단기 실황
-  Future<Result<List<WeatherItem>>> getUltraShortTermLive(double longitude, double latitude) async {
+  Future<Result<List<WeatherItem>>> getUltraShortTermLive(
+      double longitude, double latitude) async {
     final localList = await _dao.getAllUltraShortTermLiveList();
 
     // 30분 전
     DateTime dateTime = DateTime.now();
     String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-        dateTime.hour, dateTime.minute - 30)
+            dateTime.hour, dateTime.minute - 30)
         .toString()
         .replaceAll(RegExp("[^0-9\\s]"), "")
         .replaceAll(" ", "");
@@ -141,7 +155,8 @@ class WeatherRepository {
         if (date == localDate) {
           if (checkTime == localTime) {
             logger.d('getUltraShortTermLive -> local return');
-            return Result.success(localList.map((e) => e.toUltraShortTermEntity()).toList());
+            return Result.success(
+                localList.map((e) => e.toUltraShortTermEntity()).toList());
           }
         }
       }
@@ -154,8 +169,8 @@ class WeatherRepository {
 
     // remote
     try {
-      final response =
-      await _weatherApiService.getUltraShortTermLive('10', '1', date, time, x, y);
+      final response = await _weatherApiService.getUltraShortTermLive(
+          '10', '1', date, time, x, y);
       if (response.response.body?.items?.item != null) {
         List<WeatherItem> result = [];
         for (var item in response.response.body!.items!.item!) {
@@ -164,7 +179,8 @@ class WeatherRepository {
         }
         if (result.isNotEmpty) {
           _dao.clearUltraShortTermLiveList();
-          _dao.insertUltraShortTermLiveList(result.map((e) => e.toWeatherItemEntity()).toList());
+          _dao.insertUltraShortTermLiveList(
+              result.map((e) => e.toWeatherItemEntity()).toList());
         }
         logger.d('getUltraShortTermLive -> api return');
         return Result.success(result);
@@ -172,17 +188,19 @@ class WeatherRepository {
         return Result.error(Exception('getUltraShortTermLive failed: null'));
       }
     } catch (e) {
-      return Result.error(Exception('getUltraShortTermLive failed: ${e.toString()}'));
+      return Result.error(
+          Exception('getUltraShortTermLive failed: ${e.toString()}'));
     }
   }
 
   // 오늘(내일, 모레) 단기 예보
-  Future<Result<List<WeatherItem>>> getTodayShortTerm(double longitude, double latitude) async {
+  Future<Result<List<WeatherItem>>> getTodayShortTerm(
+      double longitude, double latitude) async {
     final localList = await _dao.getAllTodayShortTermList();
 
     DateTime dateTime = DateTime.now();
     String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-        dateTime.hour, dateTime.minute - 30)
+            dateTime.hour, dateTime.minute - 30)
         .toString()
         .replaceAll(RegExp("[^0-9\\s]"), "")
         .replaceAll(" ", "");
@@ -200,7 +218,8 @@ class WeatherRepository {
         if (date == localDate) {
           if (callTime == localTime) {
             logger.d('getTodayShortTerm -> local return');
-            return Result.success(localList.map((e) => e.toUltraShortTermEntity()).toList());
+            return Result.success(
+                localList.map((e) => e.toUltraShortTermEntity()).toList());
           }
         }
       }
@@ -214,7 +233,7 @@ class WeatherRepository {
     // remote
     try {
       final response =
-      await _weatherApiService.getShortTerm('1000', '1', date, time, x, y);
+          await _weatherApiService.getShortTerm('1000', '1', date, time, x, y);
       if (response.response.body?.items?.item != null) {
         List<WeatherItem> result = [];
         for (var item in response.response.body!.items!.item!) {
@@ -223,7 +242,8 @@ class WeatherRepository {
         }
         if (result.isNotEmpty) {
           _dao.clearTodayShortTermList();
-          _dao.insertTodayShortTermList(result.map((e) => e.toWeatherItemEntity()).toList());
+          _dao.insertTodayShortTermList(
+              result.map((e) => e.toWeatherItemEntity()).toList());
         }
         logger.d('getTodayShortTerm -> api return');
         return Result.success(result);
@@ -231,12 +251,14 @@ class WeatherRepository {
         return Result.error(Exception('getTodayShortTerm failed: null'));
       }
     } catch (e) {
-      return Result.error(Exception('getTodayShortTerm failed: ${e.toString()}'));
+      return Result.error(
+          Exception('getTodayShortTerm failed: ${e.toString()}'));
     }
   }
 
   // 어제 단기 예보
-  Future<Result<List<WeatherItem>>> getYesterdayShortTerm(double longitude, double latitude) async {
+  Future<Result<List<WeatherItem>>> getYesterdayShortTerm(
+      double longitude, double latitude) async {
     final localList = await _dao.getAllYesterdayShortTermList();
 
     DateTime dateTime = DateTime.now();
@@ -244,8 +266,8 @@ class WeatherRepository {
     if (dateTime.hour == 23 || dateTime.hour < 3) {
       day -= 1;
     }
-    String dt = DateTime(dateTime.year, dateTime.month, day,
-        dateTime.hour, dateTime.minute - 30)
+    String dt = DateTime(dateTime.year, dateTime.month, day, dateTime.hour,
+            dateTime.minute - 30)
         .toString()
         .replaceAll(RegExp("[^0-9\\s]"), "")
         .replaceAll(" ", "");
@@ -261,7 +283,8 @@ class WeatherRepository {
         if (date == localDate) {
           if (callTime == localTime) {
             logger.d('getYesterdayShortTerm -> local return');
-            return Result.success(localList.map((e) => e.toUltraShortTermEntity()).toList());
+            return Result.success(
+                localList.map((e) => e.toUltraShortTermEntity()).toList());
           }
         }
       }
@@ -275,7 +298,7 @@ class WeatherRepository {
     // remote
     try {
       final response =
-      await _weatherApiService.getShortTerm('600', '1', date, time, x, y);
+          await _weatherApiService.getShortTerm('600', '1', date, time, x, y);
       if (response.response.body?.items?.item != null) {
         List<WeatherItem> result = [];
         for (var item in response.response.body!.items!.item!) {
@@ -284,7 +307,8 @@ class WeatherRepository {
         }
         if (result.isNotEmpty) {
           _dao.clearYesterdayShortTermList();
-          _dao.insertYesterdayShortTermList(result.map((e) => e.toWeatherItemEntity()).toList());
+          _dao.insertYesterdayShortTermList(
+              result.map((e) => e.toWeatherItemEntity()).toList());
         }
         logger.d('getYesterdayShortTerm -> api return');
         return Result.success(result);
@@ -292,12 +316,448 @@ class WeatherRepository {
         return Result.error(Exception('getYesterdayShortTerm failed: null'));
       }
     } catch (e) {
-      return Result.error(Exception('getYesterdayShortTerm failed: ${e.toString()}'));
+      return Result.error(
+          Exception('getYesterdayShortTerm failed: ${e.toString()}'));
     }
   }
 
-// 단기 예보 (어제 - 오늘, 오늘 - 내일 - 모레)
-/*Future<Result<List<ShortTerm>>> getVilageFast(bool isToday, double longitude, double latitude) async {
+  // 중기 육상 예보
+  Future<Result<MidTermLand>> getMidTermLand(
+      String depth1, String depth2) async {
+    final localList = await _dao.getAllMidTermLandList();
+
+    String tmFc = _getMidDate();
+    String regId = _getMidTermLandRegId(depth1, depth2);
+
+    if (localList.isNotEmpty) {
+      if (tmFc == localList[0].date) {
+        logger.d('getMidTermLand -> local return');
+        return Result.success(localList[0].toMidTermLand());
+      }
+    }
+
+    // remote
+    MidTermLand result = MidTermLand();
+    try {
+      final response =
+          await _weatherApiService.getMidTermLand('10', '1', tmFc, regId);
+      if (response.response.body?.items?.item != null) {
+        for (var item in response.response.body!.items!.item!) {
+          item.date = tmFc;
+          result = item;
+        }
+        // local update
+        if (result.regId != null) {
+          _dao.clearMidTermLandList();
+          _dao.insertMidTermLand(result.toMidTermLandEntity());
+        }
+        logger.d('getMidTermLand -> api return');
+      }
+    } catch (e) {
+      return Result.error(Exception('getMidTermLand failed: ${e.toString()}'));
+    }
+
+    if (result.regId != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getMidTermLand failed: not found'));
+    }
+  }
+
+  // 중기 기온 예보
+  Future<Result<MidTermTemperature>> getMidTermTemperature(String regId) async {
+    final localList = await _dao.getAllMidTermTemperatureList();
+    String tmFc = _getMidDate();
+    if (localList.isNotEmpty) {
+      if (tmFc == localList[0].date) {
+        logger.d('getMidTermTemperature -> local return');
+        return Result.success(localList[0].toMidTermTemperature());
+      }
+    }
+
+    // remote
+    MidTermTemperature result = MidTermTemperature();
+    try {
+      final response = await _weatherApiService.getMidTermTemperature(
+          '10', '1', tmFc, regId);
+      if (response.response.body?.items?.item != null) {
+        for (var item in response.response.body!.items!.item!) {
+          item.date = tmFc;
+          result = item;
+        }
+      }
+
+      if (result.regId != null) {
+        _dao.clearMidTermTemperatureList();
+        _dao.insertMidTermTemperature(result.toMidTermTemperatureEntity());
+      }
+      logger.d('getMidTermTemperature -> api return');
+    } catch (e) {
+      return Result.error(
+          Exception('getMidTermTemperature failed: ${e.toString()}'));
+    }
+
+    if (result.regId != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getMidTermTemperature failed: not found'));
+    }
+  }
+
+  // 중기 지역별 코드 조회
+  Future<Result<MidCode>> getMidCode(String depth1, String depth2) async {
+    final localList = await _dao.getAllMidCodeList();
+    List<MidCode> list = [];
+    MidCode result = MidCode();
+    if (localList.isNotEmpty) {
+      logger.d('getMidCode -> local return');
+      list = localList.map((e) => e.toMidCode()).toList();
+    } else {
+      logger.d('getMidCode -> csv return');
+      var csv = await rootBundle.loadString(
+        "assets/data/mid_code.csv",
+      );
+      list = await MidCodeParser().parse(csv);
+      _dao.clearMidCodeList();
+      _dao.insertMidCodeList(list.map((e) => e.toMidCodeEntity()).toList());
+    }
+
+    var d1 = list.where((e) => e.city == depth2);
+    if (d1.isNotEmpty) {
+      result = d1.toList()[0];
+    } else {
+      var d2 = list.where((e) => e.city == depth1);
+      if (d2.isNotEmpty) {
+        result = d2.toList()[0];
+      } else {
+        var d3 = list.where((e) => e.city == '서울특별시');
+        if (d3.isNotEmpty) {
+          result = d3.toList()[0];
+        }
+      }
+    }
+
+    if (result.city != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getMidCode failed: not found'));
+    }
+  }
+
+  // 관측소 정보 조회
+  Future<Result<Observatory>> getObservatoryWithAddress(
+      String depth1, String depth2) async {
+    final localList = await _dao.getAllObservatoryList();
+    List<Observatory> list = [];
+    Observatory result = Observatory();
+    if (localList.isNotEmpty) {
+      logger.d('getObservatoryWithAddress -> local return');
+      list = localList.map((e) => e.toObservatory()).toList();
+    } else {
+      logger.d('getObservatoryWithAddress -> csv return');
+      var csv = await rootBundle.loadString(
+        "assets/data/observatory.csv",
+      );
+      list = await ObservatoryParser().parse(csv);
+      _dao.clearObservatory();
+      _dao.insertObservatoryList(
+          list.map((e) => e.toObservatoryEntity()).toList());
+    }
+
+    var d1 = list.where((e) => e.depth1 == depth1 && e.depth2 == depth2);
+    if (d1.isNotEmpty) {
+      result = d1.toList()[0];
+    } else {
+      var d2 = list.where((e) => e.depth1 == depth1 && e.depth2 == '');
+      if (d2.isNotEmpty) {
+        result = d2.toList()[0];
+      } else {
+        var d3 = list.where((e) => e.depth1 == '서울특별시');
+        if (d3.isNotEmpty) {
+          result = d3.toList()[0];
+        }
+      }
+    }
+
+    if (result.depth1 != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(
+          Exception('getObservatoryWithAddress failed: not found'));
+    }
+  }
+
+  // 미세 먼지 조회
+  Future<Result<List<FineDust>>> getFineDust(String depth2) async {
+    final localList = await _dao.getAllFineDustList();
+
+    if (localList.isNotEmpty) {
+      if (localList[0].dataTime != null) {
+        DateTime dateTime = DateTime.now();
+        String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
+                dateTime.hour, dateTime.minute)
+            .toString()
+            .replaceAll(RegExp("[^0-9\\s]"), "")
+            .replaceAll(" ", "");
+        String currentDate = dt.substring(0, 8);
+        String dataTime = localList[0].dataTime!;
+        String prevDate = dataTime.substring(0, 10).replaceAll("-", "");
+        String currentTime = dt.substring(8, 10);
+        String prevTime =
+            dataTime.substring(dataTime.length - 5, dataTime.length - 3);
+
+        if (currentDate == prevDate && currentTime == prevTime) {
+          logger.d('getFineDust -> local return');
+          return Result.success(localList.map((e) => e.toFineDust()).toList());
+        }
+      }
+    }
+
+    // remote
+    try {
+      final response = await _weatherApiService.getFineDust(
+          'JSON', '1', '1', 'DAILY', depth2, '1.1');
+      List<FineDust> result = [];
+
+      if (response.response.body?.items != null) {
+        for (var item in response.response.body!.items!) {
+          result.add(item);
+        }
+      }
+
+      if (result.isNotEmpty) {
+        _dao.clearFineDustList();
+        _dao.insertFineDustList(
+            result.map((e) => e.toFineDustEntity()).toList());
+      }
+      logger.d('getFineDust -> api return');
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(Exception('getFineDust failed: ${e.toString()}'));
+    }
+  }
+
+  // 출몰 조회
+  Future<Result<SunRise>> getSunRiseWithCoordinate(
+      double longitude, double latitude) async {
+    final localList = await _dao.getAllSunRise();
+    String dateTime = DateTime.now()
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String currentDate = dateTime.toString().substring(0, 8);
+
+    if (localList.isNotEmpty && currentDate == localList[0].locdate) {
+      logger.d('getSunRiseWithCoordinate -> local return');
+      return Result.success(localList[0].toSunRise());
+    }
+
+    // remote
+    try {
+      final response = await _weatherApiService.getSunRise(
+          currentDate, longitude, latitude, 'Y');
+      final xml2json = Xml2Json();
+      xml2json.parse(response);
+      final jsonString = xml2json.toParker();
+      final Map<String, dynamic> jsonData = jsonDecode(jsonString);
+      SunRise result =
+          SunRise.fromJson(jsonData['response']['body']['items']['item']);
+
+      if (result.locdate != null) {
+        _dao.clearSunRise();
+        _dao.insertSunRise(result.toSunRiseEntity());
+      }
+      logger.d('getSunRiseWithCoordinate -> api return');
+      return Result.success(result);
+    } catch (e) {
+      return Result.error(
+          Exception('getSunRiseWithCoordinate failed: ${e.toString()}'));
+    }
+  }
+
+  // 중기 기온 예보
+  Future<Result<Ultraviolet>> getUltraviolet(String areaNo) async {
+    final localList = await _dao.getAllUltravioletList();
+
+    String dt = DateTime.now()
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String time = dt.substring(0, 10);
+
+    if (localList.isNotEmpty) {
+      if (localList[0].date == time) {
+        logger.d('getUltraviolet -> local return');
+        return Result.success(localList[0].toUltraviolet());
+      }
+    }
+
+    // remote
+    Ultraviolet result = Ultraviolet();
+    try {
+      final response =
+          await _weatherApiService.getUltraviolet('10', '1', time, areaNo);
+      if (response.response.body?.items?.item != null) {
+        result = response.response.body!.items!.item!.first;
+        if (result.code != null) {
+          _dao.clearUltravioletList();
+          final list = response.response.body!.items!.item!;
+          for (Ultraviolet uv in list) {
+            uv.date = time;
+          }
+          _dao.insertUltravioletList(
+              list.map((e) => e.toUltravioletEntity()).toList());
+        }
+      }
+      logger.d('getUltraviolet -> api return');
+    } catch (e) {
+      return Result.error(Exception('getUltraviolet failed: ${e.toString()}'));
+    }
+
+    if (result.code != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getUVRays failed: not found'));
+    }
+  }
+
+  String _getMidDate() {
+    String date = '';
+    // 30분전
+    DateTime dateTime = DateTime.now();
+    String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
+            dateTime.hour, dateTime.minute - 30)
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String current = dt.substring(0, 8);
+    int currentTime = int.parse(dt.substring(8, 10));
+    String prevDt = DateTime(dateTime.year, dateTime.month, dateTime.day - 1)
+        .toString()
+        .replaceAll(RegExp("[^0-9\\s]"), "")
+        .replaceAll(" ", "");
+    String prev = prevDt.substring(0, 8);
+    if (currentTime < 6) {
+      date = '${prev}1800';
+    } else if (currentTime > 6 && currentTime < 18) {
+      date = '${current}0600';
+    } else {
+      date = '${current}1800';
+    }
+    return date;
+  }
+
+  String _getMidTermLandRegId(String depth1, String depth2) {
+    String regId = '11B00000';
+    for (String key in kMidCode.keys) {
+      if (depth1 == '강원도' && depth2.isNotEmpty) {
+        if (key.contains(depth2.substring(0, 2))) {
+          regId = kMidCode[key]!;
+          break;
+        }
+      } else {
+        if (key.contains(depth1)) {
+          regId = kMidCode[key]!;
+          break;
+        }
+      }
+    }
+    return regId;
+  }
+
+  // 중기 육상 예보
+  /*Future<Result<MidTermLand>> getMidLandFcst(
+      String depth1, String depth2) async {
+
+    final localList = await _dao.getAllMidLandFcstList();
+    String tmFc = _getMidDate();
+    String regId = _getMidFcstRegId(depth1, depth2);
+
+    if (localList.isNotEmpty) {
+      if (tmFc == localList[0].date) {
+        print('getMidLandFcst() -> local return');
+        return Result.success(localList[0].toMidLandFcst());
+      }
+    }
+
+    // remote
+    MidTermLand result = MidTermLand();
+    try {
+      final response = await _api.getMidLandFcst(tmFc, regId);
+      final jsonResult = jsonDecode(response.body);
+      MidTermLandList list =
+      MidTermLandList.fromJson(jsonResult['response']['body']);
+
+      if (list.items?.item != null) {
+        for (var item in list.items!.item!) {
+          item.date = tmFc;
+          result = item;
+        }
+      }
+      // local update
+      if (result.regId != null) {
+        _dao.clearMidLandFcstList();
+        _dao.insertMidLandFcst(result.toMidLandFcstEntity());
+      }
+      print('getMidLandFcst() -> api return');
+    } catch (e) {
+      return Result.error(Exception('getMidLandFcst failed: ${e.toString()}'));
+    }
+
+    if (result.regId != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getMidLandFcst failed: not found'));
+    }
+  }*/
+
+  // 중기 기온 예보
+  /*Future<Result<MidTermTemperature>> getMidTa(String regId) async {
+    final localList = await _dao.getAllMidTaList();
+    String tmFc = _getMidDate();
+
+    if (localList.isNotEmpty) {
+      if (tmFc == localList[0].date) {
+        print('getMidTa() -> local return');
+        return Result.success(localList[0].toMidTa());
+      }
+    }
+
+    print('tmFc');
+    print(tmFc);
+
+    // remote
+    MidTermTemperature result = MidTermTemperature();
+    try {
+      final response = await _api.getMidTa(tmFc, regId);
+      final jsonResult = jsonDecode(response.body);
+      MidTermTemperatureList list = MidTermTemperatureList.fromJson(jsonResult['response']['body']);
+
+      if (list.items?.item != null) {
+        for (var item in list.items!.item!) {
+          item.date = tmFc;
+          result = item;
+        }
+      }
+      // 로컬 업데이트
+      if (result.regId != null) {
+        _dao.clearMidTaList();
+        _dao.insertMidTa(result.toMidTaEntity());
+      }
+      print('getMidTa() -> api return');
+    } catch (e) {
+      return Result.error(Exception('getMidTa failed: ${e.toString()}'));
+    }
+
+    if (result.regId != null) {
+      return Result.success(result);
+    } else {
+      return Result.error(Exception('getMidTa failed: not found'));
+    }
+  }*/
+
+  // 단기 예보 (어제 - 오늘, 오늘 - 내일 - 모레)
+  /*Future<Result<List<ShortTerm>>> getVilageFast(bool isToday, double longitude, double latitude) async {
     final localList = await _dao.getAllVillageFcstList(isToday);
 
     DateTime dateTime = DateTime.now();
@@ -361,95 +821,6 @@ class WeatherRepository {
       return Result.success(result);
     } catch (e) {
       return Result.error(Exception('getVilageFast failed: ${e.toString()}'));
-    }
-  }*/
-
-  //
-
-  /*String _getMidFcstRegId(String depth1, String depth2) {
-    String regId = '11B00000';
-    for (String key in midFcstCode.keys) {
-      if (depth1 == '강원도' && depth2.isNotEmpty) {
-        if (key.contains(depth2.substring(0, 2))) {
-          regId = midFcstCode[key]!;
-          break;
-        }
-      } else {
-        if (key.contains(depth1)) {
-          regId = midFcstCode[key]!;
-          break;
-        }
-      }
-    }
-    return regId;
-  }*/
-
-  /*String _getMidDate() {
-    String date = '';
-    // 30분전
-    DateTime dateTime = DateTime.now();
-    String dt = DateTime(dateTime.year, dateTime.month, dateTime.day,
-            dateTime.hour, dateTime.minute - 30)
-        .toString()
-        .replaceAll(RegExp("[^0-9\\s]"), "")
-        .replaceAll(" ", "");
-    String current = dt.substring(0, 8);
-    int currentTime = int.parse(dt.substring(8, 10));
-    String prevDt = DateTime(dateTime.year, dateTime.month, dateTime.day - 1)
-        .toString()
-        .replaceAll(RegExp("[^0-9\\s]"), "")
-        .replaceAll(" ", "");
-    String prev = prevDt.substring(0, 8);
-    if (currentTime < 6) {
-      date = '${prev}1800';
-    } else if (currentTime > 6 && currentTime < 18) {
-      date = '${current}0600';
-    } else {
-      date = '${current}1800';
-    }
-    return date;
-  }*/
-
-  // 관측소 정보 조회
-  /*Future<Result<Observatory>> getObservatoryWithAddress(
-      String depth1, String depth2) async {
-    final localList = await _dao.getAllObservatoryList();
-    List<Observatory> list = [];
-    Observatory result = Observatory();
-    if (localList.isNotEmpty) {
-      print('getObservatoryWithAddress() -> local return');
-      list = localList.map((e) => e.toObservatory()).toList();
-    } else {
-      print('getObservatoryWithAddress() -> csv return');
-      var csv = await rootBundle.loadString(
-        "assets/data/observatory.csv",
-      );
-      list = await _observatoryParser.parse(csv);
-      _dao.clearObservatory();
-      _dao.insertObservatoryList(
-          list.map((e) => e.toObservatoryEntity()).toList());
-    }
-
-    var d1 = list.where((e) => e.depth1 == depth1 && e.depth2 == depth2);
-    if (d1.isNotEmpty) {
-      result = d1.toList()[0];
-    } else {
-      var d2 = list.where((e) => e.depth1 == depth1 && e.depth2 == '');
-      if (d2.isNotEmpty) {
-        result = d2.toList()[0];
-      } else {
-        var d3 = list.where((e) => e.depth1 == '서울특별시');
-        if (d3.isNotEmpty) {
-          result = d3.toList()[0];
-        }
-      }
-    }
-
-    if (result.depth1 != null) {
-      return Result.success(result);
-    } else {
-      return Result.error(
-          Exception('getObservatoryWithAddress failed: not found'));
     }
   }*/
 
@@ -595,137 +966,6 @@ class WeatherRepository {
       return Result.success(result);
     } catch (e) {
       return Result.error(Exception('getMesureDnsty failed: ${e.toString()}'));
-    }
-  }*/
-
-  // 중기 지역별 코드 조회
-  /*Future<Result<MidCode>> getMidCode(String depth1, String depth2) async {
-    final localList = await _dao.getAllMidCodeList();
-    List<MidCode> list = [];
-    MidCode result = MidCode();
-    if (localList.isNotEmpty) {
-      print('getMidCode() -> local return');
-      list = localList.map((e) => e.toMidCode()).toList();
-    } else {
-      print('getMidCode() -> csv return');
-      var csv = await rootBundle.loadString(
-        "assets/data/mid_code.csv",
-      );
-      list = await _midCodeParser.parse(csv);
-      _dao.clearMidCodeList();
-      _dao.insertMidCodeList(list.map((e) => e.toMidCodeEntity()).toList());
-    }
-
-    var d1 = list.where((e) => e.city == depth2);
-    if (d1.isNotEmpty) {
-      result = d1.toList()[0];
-    } else {
-      var d2 = list.where((e) => e.city == depth1);
-      if (d2.isNotEmpty) {
-        result = d2.toList()[0];
-      } else {
-        var d3 = list.where((e) => e.city == '서울특별시');
-        if (d3.isNotEmpty) {
-          result = d3.toList()[0];
-        }
-      }
-    }
-
-    if (result.city != null) {
-      return Result.success(result);
-    } else {
-      return Result.error(Exception('getMidCode failed: not found'));
-    }
-  }*/
-
-  // 중기 기온 예보
-  /*Future<Result<MidTermTemperature>> getMidTa(String regId) async {
-    final localList = await _dao.getAllMidTaList();
-    String tmFc = _getMidDate();
-
-    if (localList.isNotEmpty) {
-      if (tmFc == localList[0].date) {
-        print('getMidTa() -> local return');
-        return Result.success(localList[0].toMidTa());
-      }
-    }
-
-    print('tmFc');
-    print(tmFc);
-
-    // remote
-    MidTermTemperature result = MidTermTemperature();
-    try {
-      final response = await _api.getMidTa(tmFc, regId);
-      final jsonResult = jsonDecode(response.body);
-      MidTermTemperatureList list = MidTermTemperatureList.fromJson(jsonResult['response']['body']);
-
-      if (list.items?.item != null) {
-        for (var item in list.items!.item!) {
-          item.date = tmFc;
-          result = item;
-        }
-      }
-      // 로컬 업데이트
-      if (result.regId != null) {
-        _dao.clearMidTaList();
-        _dao.insertMidTa(result.toMidTaEntity());
-      }
-      print('getMidTa() -> api return');
-    } catch (e) {
-      return Result.error(Exception('getMidTa failed: ${e.toString()}'));
-    }
-
-    if (result.regId != null) {
-      return Result.success(result);
-    } else {
-      return Result.error(Exception('getMidTa failed: not found'));
-    }
-  }*/
-
-  // 중기 육상 예보
-  /*Future<Result<MidTermLand>> getMidLandFcst(
-      String depth1, String depth2) async {
-
-    final localList = await _dao.getAllMidLandFcstList();
-    String tmFc = _getMidDate();
-    String regId = _getMidFcstRegId(depth1, depth2);
-
-    if (localList.isNotEmpty) {
-      if (tmFc == localList[0].date) {
-        print('getMidLandFcst() -> local return');
-        return Result.success(localList[0].toMidLandFcst());
-      }
-    }
-
-    // remote
-    MidTermLand result = MidTermLand();
-    try {
-      final response = await _api.getMidLandFcst(tmFc, regId);
-      final jsonResult = jsonDecode(response.body);
-      MidTermLandList list =
-      MidTermLandList.fromJson(jsonResult['response']['body']);
-
-      if (list.items?.item != null) {
-        for (var item in list.items!.item!) {
-          item.date = tmFc;
-          result = item;
-        }
-      }
-      // local update
-      if (result.regId != null) {
-        _dao.clearMidLandFcstList();
-        _dao.insertMidLandFcst(result.toMidLandFcstEntity());
-      }
-      print('getMidLandFcst() -> api return');
-    } catch (e) {
-      return Result.error(Exception('getMidLandFcst failed: ${e.toString()}'));
-    }
-
-    if (result.regId != null) {
-      return Result.success(result);
-    } else {
-      return Result.error(Exception('getMidLandFcst failed: not found'));
     }
   }*/
 

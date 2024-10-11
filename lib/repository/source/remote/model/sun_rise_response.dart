@@ -1,20 +1,19 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sweater/repository/source/remote/model/weather_category.dart';
 
-part 'weather_response.g.dart';
+part 'sun_rise_response.g.dart';
 
 @JsonSerializable()
-class WeatherResponse {
+class SunRiseResponse {
   final ResponseData response;
 
-  WeatherResponse({
+  SunRiseResponse({
     required this.response,
   });
 
-  factory WeatherResponse.fromJson(Map<String, dynamic> json) =>
-      _$WeatherResponseFromJson(json);
+  factory SunRiseResponse.fromJson(Map<String, dynamic> json) =>
+      _$SunRiseResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherResponseToJson(this);
+  Map<String, dynamic> toJson() => _$SunRiseResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -73,7 +72,7 @@ class ResponseBody {
 
 @JsonSerializable()
 class Items {
-  final List<WeatherItem>? item;
+  final List<SunRise>? item;
 
   Items({
     this.item,
@@ -85,32 +84,29 @@ class Items {
 }
 
 @JsonSerializable()
-class WeatherItem {
-  String? baseDate;
-  String? baseTime;
-  String? category;
-  int? nx;
-  int? ny;
-  String? obsrValue;
-  String? fcstDate;
-  String? fcstTime;
-  String? fcstValue;
-  WeatherCategory? weatherCategory;
+class SunRise {
+  String? locdate;
+  String? location;
+  String? sunrise;
+  String? sunset;
+  String? moonrise;
+  String? moonset;
+  String? longitudeNum;
+  String? latitudeNum;
 
-  WeatherItem({
-    this.baseDate,
-    this.baseTime,
-    this.category,
-    this.nx,
-    this.ny,
-    this.obsrValue,
-    this.fcstDate,
-    this.fcstTime,
-    this.fcstValue,
+  SunRise({
+    this.locdate,
+    this.location,
+    this.sunrise,
+    this.sunset,
+    this.moonrise,
+    this.moonset,
+    this.longitudeNum,
+    this.latitudeNum,
   });
 
-  factory WeatherItem.fromJson(Map<String, dynamic> json) =>
-      _$WeatherItemFromJson(json);
+  factory SunRise.fromJson(Map<String, dynamic> json) =>
+      _$SunRiseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherItemToJson(this);
+  Map<String, dynamic> toJson() => _$SunRiseToJson(this);
 }

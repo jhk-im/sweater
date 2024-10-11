@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'mid_ta_entity.g.dart';
+part 'mid_term_temperature_entity.g.dart';
 
 @HiveType(typeId: 8)
-class MidTaEntity extends HiveObject {
+class MidTermTemperatureEntity extends HiveObject {
   @HiveField(0)
   String? regId;
   @HiveField(1)

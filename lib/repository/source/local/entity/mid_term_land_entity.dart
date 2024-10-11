@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'mid_land_fcst_entity.g.dart';
+part 'mid_term_land_entity.g.dart';
 
 @HiveType(typeId: 9)
-class MidLandFcstEntity extends HiveObject {
+class MidTermLandEntity extends HiveObject {
   @HiveField(0)
   String? regId;
   @HiveField(1)

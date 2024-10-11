@@ -2,6 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sweater/repository/source/local/entity/address_entity.dart';
+import 'package:sweater/repository/source/local/entity/fine_dust_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_code_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_term_land_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_term_temperature_entity.dart';
+import 'package:sweater/repository/source/local/entity/observatory_entity.dart';
+import 'package:sweater/repository/source/local/entity/sun_rise_entity.dart';
+import 'package:sweater/repository/source/local/entity/ultraviolet_entity.dart';
 import 'package:sweater/repository/source/local/entity/weather_item_entity.dart';
 import 'package:sweater/repository/source/local/weather_dao.dart';
 import 'package:sweater/repository/source/remote/address_api_service.dart';
@@ -26,27 +33,34 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(AddressEntityAdapter());
   Hive.registerAdapter(WeatherItemEntityAdapter());
+  Hive.registerAdapter(MidTermLandEntityAdapter());
+  Hive.registerAdapter(MidTermTemperatureEntityAdapter());
+  Hive.registerAdapter(MidCodeEntityAdapter());
+  Hive.registerAdapter(ObservatoryEntityAdapter());
+  Hive.registerAdapter(FineDustEntityAdapter());
+  Hive.registerAdapter(SunRiseEntityAdapter());
+  Hive.registerAdapter(UltravioletEntityAdapter());
 
   // repository
   final addressDio = Dio();
   addressDio.options.headers['Authorization'] = 'KakaoAK $kakaoApiKey';
   final addressApi =
-  AddressApiService(addressDio, baseUrl: "https://dapi.kakao.com");
+      AddressApiService(addressDio, baseUrl: "https://dapi.kakao.com");
   final weatherDio = Dio();
   weatherDio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) {
       options.queryParameters['serviceKey'] = weatherServiceKey ?? '';
       options.queryParameters['dataType'] = 'JSON';
       return handler.next(options);
-    }
+    },
   ));
-  weatherDio.interceptors.add(LogInterceptor(
-    responseBody: true,       // 응답 바디 로그 출력
-    error: true,              // 오류 로그 출력
-    logPrint: (obj) => print(obj),  // 로그 출력 방식 설정 (콘솔 출력)
-  ));
+  // weatherDio.interceptors.add(LogInterceptor(
+  //   responseBody: true,       // 응답 바디 로그 출력
+  //   error: true,              // 오류 로그 출력
+  //   logPrint: (obj) => print(obj),  // 로그 출력 방식 설정 (콘솔 출력)
+  // ));
   final weatherApi =
-  WeatherApiService(weatherDio, baseUrl: "https://apis.data.go.kr");
+      WeatherApiService(weatherDio, baseUrl: "https://apis.data.go.kr");
   final repository = WeatherRepository(addressApi, weatherApi, WeatherDao());
   GetIt.instance.registerSingleton<WeatherRepository>(repository);
 

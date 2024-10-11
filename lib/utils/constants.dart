@@ -87,16 +87,16 @@ const Map<String, String> kMidCode = {
 };
 
 const Map<String, int> kStatusStates = {
-  '비' : 0,
-  '비/눈' : 0,
-  '소나기' : 0,
-  '빗방울' : 0,
-  '빗방울/눈날림' : 0,
-  '눈' : 1,
-  '눈날림' : 1,
-  '맑음' : 2,
-  '구름많음' : 3,
-  '흐림' : 4,
+  '비': 0,
+  '비/눈': 0,
+  '소나기': 0,
+  '빗방울': 0,
+  '빗방울/눈날림': 0,
+  '눈': 1,
+  '눈날림': 1,
+  '맑음': 2,
+  '구름많음': 3,
+  '흐림': 4,
 };
 
 const List<String> kWeatherWeekIconList = [

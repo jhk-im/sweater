@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sweater/repository/source/remote/model/short_term.dart';
 import 'package:sweater/repository/source/remote/model/weather_response.dart';
 import 'package:sweater/utils/text_styles.dart';
 import 'package:sweater/viewmodel/weather_main_state.dart';
@@ -40,7 +39,8 @@ class _MainTopWidgetState extends State<MainTopWidget> {
             if (!widget.isScrollDown)
               Text(
                 widget.state.ultraShortTerm.isNotEmpty
-                    ? _getTemperatureFromUltraShortTerm(widget.state.ultraShortTerm)
+                    ? _getTemperatureFromUltraShortTerm(
+                        widget.state.ultraShortTerm)
                     : '',
                 style: largeTitleBold(context),
               ),
@@ -60,9 +60,7 @@ class _MainTopWidgetState extends State<MainTopWidget> {
               Padding(
                 padding: const EdgeInsets.only(top: 4.0),
                 child: Text(
-                  '${widget.state.todayTmpList.isNotEmpty
-                      ? '${widget.state.todayTmpList[0].fcstValue ?? ''}°'
-                      : ''} / ${widget.state.skyList.isNotEmpty ? widget.state.skyList[0].fcstValue ?? '' : ''}',
+                  '${widget.state.todayTmpList.isNotEmpty ? '${widget.state.todayTmpList[0].fcstValue ?? ''}°' : ''} / ${widget.state.skyList.isNotEmpty ? widget.state.skyList[0].fcstValue ?? '' : ''}',
                   style: body(context),
                 ),
               ),

@@ -31,8 +31,7 @@ class Meta {
     this.totalCount,
   });
 
-  factory Meta.fromJson(Map<String, dynamic> json) =>
-      _$MetaFromJson(json);
+  factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
 
   Map<String, dynamic> toJson() => _$MetaToJson(this);
 }
@@ -55,17 +54,16 @@ class AddressResult {
   final double? x;
   final double? y;
 
-  AddressResult({
-    this.regionType,
-    this.code,
-    this.addressName,
-    this.region1depthName,
-    this.region2depthName,
-    this.region3depthName,
-    this.region4depthName,
-    this.x,
-    this.y
-  });
+  AddressResult(
+      {this.regionType,
+      this.code,
+      this.addressName,
+      this.region1depthName,
+      this.region2depthName,
+      this.region3depthName,
+      this.region4depthName,
+      this.x,
+      this.y});
 
   factory AddressResult.fromJson(Map<String, dynamic> json) =>
       _$AddressResultFromJson(json);

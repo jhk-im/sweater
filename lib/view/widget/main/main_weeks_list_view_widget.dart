@@ -46,7 +46,7 @@ class MainWeeksListViewWidget extends StatelessWidget {
                         children: [
                           if (_getPrecipitation(index).isNotEmpty)
                             pngIcon('rainy.png',
-                                Theme.of(context).colorScheme.onBackground,
+                                Theme.of(context).colorScheme.onSurface,
                                 width: 14, height: 14),
                           Text(_getPrecipitation(index),
                               style: caption3(context, 1.0),
@@ -61,7 +61,7 @@ class MainWeeksListViewWidget extends StatelessWidget {
                         children: [
                           if (_getSkyStatus(index).isNotEmpty)
                             pngIcon(_getSkyStatus(index),
-                                Theme.of(context).colorScheme.onBackground,
+                                Theme.of(context).colorScheme.onSurface,
                                 width: 18, height: 18),
                         ],
                       ),
@@ -114,8 +114,9 @@ class MainWeeksListViewWidget extends StatelessWidget {
     if (index == 0) {
       return '';
     } else {
-      final fcstValue =
-          state.popList.isNotEmpty ? state.popList[index - 1].fcstValue ?? '' : '';
+      final fcstValue = state.popList.isNotEmpty
+          ? state.popList[index - 1].fcstValue ?? ''
+          : '';
       if (fcstValue == '0') {
         return '';
       } else {
@@ -126,7 +127,9 @@ class MainWeeksListViewWidget extends StatelessWidget {
 
   String _getSkyStatus(int index) {
     if (index > 0) {
-      String fcstValue = state.skyList.isNotEmpty ? state.skyList[index - 1].fcstValue ?? '' : '';
+      String fcstValue = state.skyList.isNotEmpty
+          ? state.skyList[index - 1].fcstValue ?? ''
+          : '';
       if (fcstValue.contains('맑')) {
         return 'sunny.png';
       } else if (fcstValue.contains('흐')) {

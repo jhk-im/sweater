@@ -25,14 +25,31 @@ class WeatherMainViewModel with ChangeNotifier {
     notifyListeners();
 
     // 현재 좌표 주소
-    var getAddress = await _repository.getAddressWithCoordinate();
+    final getAddress = await _repository.getAddressWithCoordinate();
     _state = _state.copyWith(address: getAddress);
     double longitude = getAddress.x ?? 0;
     double latitude = getAddress.y ?? 0;
+    String depth1 = getAddress.region1depthName ?? '';
+    String depth2 = getAddress.region2depthName ?? '';
+
+    final getMidCode = await _repository.getMidCode(depth1, depth2);
+    getMidCode.when(success: (midCode) {
+      _state = _state.copyWith(midCode: midCode);
+    }, error: (e) {
+      logger.e(e);
+    });
+
+    final getObservatoryWithAddress =
+        await _repository.getObservatoryWithAddress(depth1, depth2);
+    getObservatoryWithAddress.when(success: (observatory) {
+      _state = _state.copyWith(observatory: observatory);
+    }, error: (e) {
+      logger.e(e);
+    });
 
     // 초단기 실황
-    var getUltraShortTerm =
-    await _repository.getUltraShortTermLive(longitude, latitude);
+    final getUltraShortTerm =
+        await _repository.getUltraShortTermLive(longitude, latitude);
     getUltraShortTerm.when(success: (ultraShortTerm) {
       _state = state.copyWith(ultraShortTerm: ultraShortTerm);
     }, error: (e) {
@@ -40,8 +57,8 @@ class WeatherMainViewModel with ChangeNotifier {
     });
 
     // 오늘(내일, 모레) 예보
-    var getTodayShortTerm =
-    await _repository.getTodayShortTerm(longitude, latitude);
+    final getTodayShortTerm =
+        await _repository.getTodayShortTerm(longitude, latitude);
     getTodayShortTerm.when(success: (todayShortTerm) {
       final date = DateTime.now();
       final todayDate = date
@@ -58,9 +75,9 @@ class WeatherMainViewModel with ChangeNotifier {
       List<WeatherItem> todayList = [];
       todayList.addAll(todayShortTerm
           .where((element) =>
-          int.parse(element.fcstDate!) == int.parse(today) &&
-          int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
-          int.parse(element.fcstDate!) > int.parse(today))
+              int.parse(element.fcstDate!) == int.parse(today) &&
+                  int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
+              int.parse(element.fcstDate!) > int.parse(today))
           .toList());
       List<WeatherItem> todayTmpList = [];
       todayTmpList.addAll(
@@ -75,9 +92,9 @@ class WeatherMainViewModel with ChangeNotifier {
       List<WeatherItem> tomorrowList = [];
       tomorrowList.addAll(todayShortTerm
           .where((element) =>
-      int.parse(element.fcstDate!) == int.parse(tomorrow) &&
-          int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
-          int.parse(element.fcstDate!) > int.parse(tomorrow))
+              int.parse(element.fcstDate!) == int.parse(tomorrow) &&
+                  int.parse(element.fcstTime!.substring(0, 2)) >= todayTime ||
+              int.parse(element.fcstDate!) > int.parse(tomorrow))
           .toList());
       List<WeatherItem> tomorrowTmpList = [];
       tomorrowTmpList.addAll(
@@ -126,12 +143,105 @@ class WeatherMainViewModel with ChangeNotifier {
     });
 
     // 어제 예보
-    var getYesterdayShortTerm =
-    await _repository.getYesterdayShortTerm(longitude, latitude);
+    final getYesterdayShortTerm =
+        await _repository.getYesterdayShortTerm(longitude, latitude);
     getYesterdayShortTerm.when(success: (yesterdayShortTerm) {
-      _state = state.copyWith(yesterdayTmpList: yesterdayShortTerm.where((element) => element.category! == 'TMP').toList());
-      _state = state.copyWith(yesterdaySkyList: yesterdayShortTerm.where((element) => element.category! == 'SKY').toList());
-      _state = state.copyWith(yesterdayPopList: yesterdayShortTerm.where((element) => element.category! == 'POP').toList());
+      _state = state.copyWith(
+          yesterdayTmpList: yesterdayShortTerm
+              .where((element) => element.category! == 'TMP')
+              .toList());
+      _state = state.copyWith(
+          yesterdaySkyList: yesterdayShortTerm
+              .where((element) => element.category! == 'SKY')
+              .toList());
+      _state = state.copyWith(
+          yesterdayPopList: yesterdayShortTerm
+              .where((element) => element.category! == 'POP')
+              .toList());
+    }, error: (e) {
+      logger.e(e);
+    });
+
+    // 중기 육상 예보
+    final getMidTermLand = await _repository.getMidTermLand(depth1, depth2);
+    getMidTermLand.when(success: (midTermLand) {
+      final popList = state.popList.sublist(0);
+      popList.add(_createWeatherItem(popList.last,
+          max(midTermLand.rnSt3Am ?? 0, midTermLand.rnSt3Pm ?? 0)));
+      popList.add(_createWeatherItem(popList.last,
+          max(midTermLand.rnSt4Am ?? 0, midTermLand.rnSt4Pm ?? 0)));
+      popList.add(_createWeatherItem(popList.last,
+          max(midTermLand.rnSt5Am ?? 0, midTermLand.rnSt5Pm ?? 0)));
+      popList.add(_createWeatherItem(popList.last,
+          max(midTermLand.rnSt6Am ?? 0, midTermLand.rnSt6Pm ?? 0)));
+      popList.add(_createWeatherItem(popList.last,
+          max(midTermLand.rnSt7Am ?? 0, midTermLand.rnSt7Pm ?? 0)));
+      popList.add(_createWeatherItem(popList.last, midTermLand.rnSt8 ?? 0));
+      popList.add(_createWeatherItem(popList.last, midTermLand.rnSt9 ?? 0));
+      popList.add(_createWeatherItem(popList.last, midTermLand.rnSt10 ?? 0));
+      final skyList = state.skyList.sublist(0);
+      skyList.add(_createWeatherItem(skyList.last, midTermLand.wf3Pm ?? ''));
+      skyList.add(_createWeatherItem(skyList.last, midTermLand.wf4Pm ?? ''));
+      skyList.add(_createWeatherItem(skyList.last, midTermLand.wf5Pm ?? ''));
+      skyList.add(_createWeatherItem(skyList.last, midTermLand.wf6Pm ?? ''));
+      skyList.add(_createWeatherItem(skyList.last, midTermLand.wf7Pm ?? ''));
+      skyList.add(_createWeatherItem(skyList.last, midTermLand.wf8 ?? ''));
+      skyList.add(_createWeatherItem(skyList.last, midTermLand.wf9 ?? ''));
+      skyList.add(_createWeatherItem(skyList.last, midTermLand.wf10 ?? ''));
+      _state = state.copyWith(popList: popList, skyList: skyList);
+    }, error: (e) {
+      logger.e(e);
+    });
+
+    // 중기 기온 예보
+    var getMidTa =
+        await _repository.getMidTermTemperature(_state.midCode?.code ?? '');
+    getMidTa.when(success: (midTemp) {
+      final tmnList = state.tmnList.sublist(0);
+      tmnList.add(_createWeatherItem(tmnList.last, midTemp.taMin3 ?? 0));
+      tmnList.add(_createWeatherItem(tmnList.last, midTemp.taMin4 ?? 0));
+      tmnList.add(_createWeatherItem(tmnList.last, midTemp.taMin5 ?? 0));
+      tmnList.add(_createWeatherItem(tmnList.last, midTemp.taMin6 ?? 0));
+      tmnList.add(_createWeatherItem(tmnList.last, midTemp.taMin7 ?? 0));
+      tmnList.add(_createWeatherItem(tmnList.last, midTemp.taMin8 ?? 0));
+      tmnList.add(_createWeatherItem(tmnList.last, midTemp.taMin9 ?? 0));
+      tmnList.add(_createWeatherItem(tmnList.last, midTemp.taMin10 ?? 0));
+      final tmxList = state.tmxList.sublist(0);
+      tmxList.add(_createWeatherItem(tmxList.last, midTemp.taMax3 ?? 0));
+      tmxList.add(_createWeatherItem(tmxList.last, midTemp.taMax4 ?? 0));
+      tmxList.add(_createWeatherItem(tmxList.last, midTemp.taMax5 ?? 0));
+      tmxList.add(_createWeatherItem(tmxList.last, midTemp.taMax6 ?? 0));
+      tmxList.add(_createWeatherItem(tmxList.last, midTemp.taMax7 ?? 0));
+      tmxList.add(_createWeatherItem(tmxList.last, midTemp.taMax8 ?? 0));
+      tmxList.add(_createWeatherItem(tmxList.last, midTemp.taMax9 ?? 0));
+      tmxList.add(_createWeatherItem(tmxList.last, midTemp.taMax10 ?? 0));
+      _state = state.copyWith(tmnList: tmnList, tmxList: tmxList);
+    }, error: (e) {
+      logger.e(e);
+    });
+
+    // 대기
+    var getFineDust = await _repository.getFineDust(depth2);
+    getFineDust.when(success: (fineDustList) {
+      _state = state.copyWith(fineDustList: fineDustList);
+    }, error: (e) {
+      logger.e(e);
+    });
+
+    // 출몰
+    var getRiseSet =
+        await _repository.getSunRiseWithCoordinate(longitude, latitude);
+    getRiseSet.when(success: (riseSet) {
+      _state = state.copyWith(riseSet: riseSet);
+    }, error: (e) {
+      logger.e(e);
+    });
+
+    // 자외선
+    var getUltraviolet =
+        await _repository.getUltraviolet('${_state.observatory?.code}');
+    getUltraviolet.when(success: (ultraviolet) {
+      _state = state.copyWith(ultraviolet: ultraviolet);
     }, error: (e) {
       logger.e(e);
     });
@@ -567,25 +677,26 @@ class WeatherMainViewModel with ChangeNotifier {
       startDate = item.fcstDate ?? '';
     }
     WeatherItem last = updateList.last;
-    last.fcstValue = last.weatherCategory?.codeValues?[int.parse(last.fcstValue ?? '')];
+    last.fcstValue =
+        last.weatherCategory?.codeValues?[int.parse(last.fcstValue ?? '')];
   }
 
-  /*ShortTerm _createFcst(ShortTerm last, value) {
-    ShortTerm fcst = ShortTerm();
-    fcst.category = last.category;
-    fcst.weatherCategory = last.weatherCategory;
-    fcst.baseTime = last.baseTime;
-    fcst.baseDate = last.baseDate;
-    fcst.nx = last.nx;
-    fcst.ny = last.ny;
-    fcst.fcstTime = last.fcstTime;
+  WeatherItem _createWeatherItem(WeatherItem last, value) {
+    WeatherItem item = WeatherItem();
+    item.category = last.category;
+    item.weatherCategory = last.weatherCategory;
+    item.baseTime = last.baseTime;
+    item.baseDate = last.baseDate;
+    item.nx = last.nx;
+    item.ny = last.ny;
+    item.fcstTime = last.fcstTime;
     final date = DateTime.parse(last.fcstDate ?? '');
     final newDate = DateTime(date.year, date.month, date.day + 1)
         .toString()
         .replaceAll(RegExp("[^0-9\\s]"), "")
         .replaceAll(" ", "");
-    fcst.fcstDate = newDate.substring(0, 8);
-    fcst.fcstValue = '$value';
-    return fcst;
-  }*/
+    item.fcstDate = newDate.substring(0, 8);
+    item.fcstValue = '$value';
+    return item;
+  }
 }

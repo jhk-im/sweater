@@ -29,42 +29,61 @@ class MainTodayListViewWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Text(
-                          state.todayTmpList.isNotEmpty && !state.todayTmpList[index].fcstTime!.contains('일')
+                          state.todayTmpList.isNotEmpty &&
+                                  !state.todayTmpList[index].fcstTime!
+                                      .contains('일')
                               ? '${state.todayTmpList[index].fcstTime?.substring(0, 2)}시'
-                              : state.todayTmpList.isNotEmpty ? state.todayTmpList[index].fcstTime ?? '' : '',
+                              : state.todayTmpList.isNotEmpty
+                                  ? state.todayTmpList[index].fcstTime ?? ''
+                                  : '',
                           style: caption2(context, 1.0),
                         ),
                         if (_getSkyStatus(state.todaySkyList, index).isNotEmpty)
                           pngIcon(_getSkyStatus(state.todaySkyList, index),
-                            Theme.of(context).colorScheme.surface,
+                              Theme.of(context).colorScheme.onSurface,
                               width: 18, height: 18),
                         Text(
-                          state.yesterdayTmpList.isNotEmpty && !state.yesterdayTmpList[index].fcstTime!.contains('일')
+                          state.yesterdayTmpList.isNotEmpty &&
+                                  !state.yesterdayTmpList[index].fcstTime!
+                                      .contains('일')
                               ? '${state.yesterdayTmpList[index].fcstValue ?? ''}°'
-                              : state.yesterdayTmpList.isNotEmpty ? '${int.parse(state.yesterdayTmpList[index].fcstValue?.substring(0, 2) ?? '0')}:${state.yesterdayTmpList[index].fcstValue?.substring(2, 4)}' : '',
+                              : state.yesterdayTmpList.isNotEmpty
+                                  ? '${int.parse(state.yesterdayTmpList[index].fcstValue?.substring(0, 2) ?? '0')}:${state.yesterdayTmpList[index].fcstValue?.substring(2, 4)}'
+                                  : '',
                           style: caption1(context, 0.3),
                         ),
                         Text(
-                          state.todayTmpList.isNotEmpty && !state.todayTmpList[index].fcstTime!.contains('일')
+                          state.todayTmpList.isNotEmpty &&
+                                  !state.todayTmpList[index].fcstTime!
+                                      .contains('일')
                               ? '${state.todayTmpList[index].fcstValue ?? ''}°'
-                              : state.todayTmpList.isNotEmpty ? '${int.parse(state.todayTmpList[index].fcstValue?.substring(0, 2) ?? '0')}:${state.todayTmpList[index].fcstValue?.substring(2, 4)}' : '',
+                              : state.todayTmpList.isNotEmpty
+                                  ? '${int.parse(state.todayTmpList[index].fcstValue?.substring(0, 2) ?? '0')}:${state.todayTmpList[index].fcstValue?.substring(2, 4)}'
+                                  : '',
                           style: caption1(context, 1.0),
                         ),
                         Text(
-                          state.tomorrowTmpList.isNotEmpty && !state.tomorrowTmpList[index].fcstTime!.contains('일')
+                          state.tomorrowTmpList.isNotEmpty &&
+                                  !state.tomorrowTmpList[index].fcstTime!
+                                      .contains('일')
                               ? '${state.tomorrowTmpList[index].fcstValue ?? ''}°'
-                              : state.tomorrowTmpList.isNotEmpty ? '${int.parse(state.tomorrowTmpList[index].fcstValue?.substring(0, 2) ?? '0')}:${state.tomorrowTmpList[index].fcstValue?.substring(2, 4)}' : '',
+                              : state.tomorrowTmpList.isNotEmpty
+                                  ? '${int.parse(state.tomorrowTmpList[index].fcstValue?.substring(0, 2) ?? '0')}:${state.tomorrowTmpList[index].fcstValue?.substring(2, 4)}'
+                                  : '',
                           style: caption1(context, 0.5),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            if (_getPrecipitation(state.todayPopList, index).isNotEmpty)
-                            pngIcon('rainy.png',
-                                Theme.of(context).colorScheme.surface,
-                                width: 14, height: 14),
-                            Text(_getPrecipitation(state.todayPopList, index),
-                                style: caption3(context, 1.0),),
+                            if (_getPrecipitation(state.todayPopList, index)
+                                .isNotEmpty)
+                              pngIcon('rainy.png',
+                                  Theme.of(context).colorScheme.onSurface,
+                                  width: 14, height: 14),
+                            Text(
+                              _getPrecipitation(state.todayPopList, index),
+                              style: caption3(context, 1.0),
+                            ),
                           ],
                         ),
                       ],
@@ -78,8 +97,7 @@ class MainTodayListViewWidget extends StatelessWidget {
   }
 
   String _getPrecipitation(List<WeatherItem> popList, int index) {
-    final fcstValue =
-    popList.isNotEmpty ? popList[index].fcstValue ?? '' : '';
+    final fcstValue = popList.isNotEmpty ? popList[index].fcstValue ?? '' : '';
     if (fcstValue == '0') {
       return '';
     } else {
@@ -88,7 +106,9 @@ class MainTodayListViewWidget extends StatelessWidget {
   }
 
   String _getSkyStatus(List<WeatherItem> skyList, int index) {
-    final time = int.parse(skyList.isNotEmpty ? skyList[index].fcstTime?.substring(0, 2) ?? '0' : '0');
+    final time = int.parse(skyList.isNotEmpty
+        ? skyList[index].fcstTime?.substring(0, 2) ?? '0'
+        : '0');
 
     int sunrise = 5;
     int sunset = 19;

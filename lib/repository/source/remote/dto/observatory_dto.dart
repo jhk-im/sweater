@@ -22,6 +22,6 @@ class ObservatoryDto with _$ObservatoryDto {
     required double latitude,
   }) = _ObservatoryDto;
 
-  factory ObservatoryDto.fromJson(Map<String, Object?> json)
-  => _$ObservatoryDtoFromJson(json);
+  factory ObservatoryDto.fromJson(Map<String, Object?> json) =>
+      _$ObservatoryDtoFromJson(json);
 }

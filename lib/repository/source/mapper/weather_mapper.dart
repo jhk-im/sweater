@@ -1,27 +1,24 @@
 import 'package:sweater/repository/source/local/entity/mid_code_entity.dart';
-import 'package:sweater/repository/source/local/entity/mid_ta_entity.dart';
-import 'package:sweater/repository/source/local/entity/mid_land_fcst_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_term_temperature_entity.dart';
+import 'package:sweater/repository/source/local/entity/mid_term_land_entity.dart';
 import 'package:sweater/repository/source/local/entity/observatory_entity.dart';
-import 'package:sweater/repository/source/local/entity/rise_set_entity.dart';
-import 'package:sweater/repository/source/local/entity/uv_rays_entity.dart';
+import 'package:sweater/repository/source/local/entity/sun_rise_entity.dart';
+import 'package:sweater/repository/source/local/entity/ultraviolet_entity.dart';
 import 'package:sweater/repository/source/remote/dto/mid_code_dto.dart';
 import 'package:sweater/repository/source/remote/dto/observatory_dto.dart';
 import 'package:sweater/repository/source/remote/model/address_response.dart';
-import 'package:sweater/repository/source/remote/model/fine_dust.dart';
-import 'package:sweater/repository/source/remote/model/short_term.dart';
+import 'package:sweater/repository/source/remote/model/fine_dust_response.dart';
 import 'package:sweater/repository/source/remote/model/mid_code.dart';
-import 'package:sweater/repository/source/remote/model/mid_term_land.dart';
-import 'package:sweater/repository/source/remote/model/mid_term_temperature.dart';
+import 'package:sweater/repository/source/remote/model/mid_term_land_response.dart';
+import 'package:sweater/repository/source/remote/model/mid_term_temperature_response.dart';
 import 'package:sweater/repository/source/remote/model/observatory.dart';
+import 'package:sweater/repository/source/remote/model/sun_rise_response.dart';
+import 'package:sweater/repository/source/remote/model/ultraviolet_response.dart';
 import 'package:sweater/repository/source/remote/model/weather_response.dart';
-import 'package:sweater/repository/source/remote/model/ultraviolet.dart';
 import 'package:sweater/repository/source/remote/model/weather_category.dart';
 import 'package:sweater/repository/source/local/entity/address_entity.dart';
-import 'package:sweater/repository/source/local/entity/dnsty_entity.dart';
-import 'package:sweater/repository/source/local/entity/fcst_entity.dart';
+import 'package:sweater/repository/source/local/entity/fine_dust_entity.dart';
 import 'package:sweater/repository/source/local/entity/weather_item_entity.dart';
-
-import '../remote/model/sun_rise_set.dart';
 
 extension ToWeatherItem on WeatherItemEntity {
   WeatherItem toUltraShortTermEntity() {
@@ -45,7 +42,7 @@ extension ToWeatherItem on WeatherItemEntity {
 extension ToWeatherItemEntity on WeatherItem {
   WeatherItemEntity toWeatherItemEntity() {
     var entity =
-    WeatherItemEntity(category: category ?? '', obsrValue: obsrValue ?? '');
+        WeatherItemEntity(category: category ?? '', obsrValue: obsrValue ?? '');
     entity.baseTime = baseTime;
     entity.baseDate = baseDate;
     entity.nx = nx;
@@ -60,96 +57,60 @@ extension ToWeatherItemEntity on WeatherItem {
   }
 }
 
-// 날씨 예보
-extension ToFcst on FcstEntity {
-  ShortTerm toFcst() {
-    var fcst = ShortTerm(
-      baseDate: baseDate,
-      baseTime: baseTime,
-      category: category,
-      fcstDate: fcstDate,
-      fcstTime: fcstTime,
-      fcstValue: fcstValue,
-      nx: nx,
-      ny: ny,
-    );
-    fcst.weatherCategory =
-        WeatherCategory(name: name, unit: unit, codeValues: codeValues);
-    return fcst;
-  }
-}
-
-extension ToFcstEntity on ShortTerm {
-  FcstEntity toFcstEntity() {
-    var entity =
-        FcstEntity(category: category ?? '', fcstValue: fcstValue ?? '');
-    entity.baseTime = baseTime;
-    entity.baseDate = baseDate;
-    entity.fcstTime = fcstTime;
-    entity.fcstDate = fcstDate;
-    entity.nx = nx;
-    entity.ny = ny;
-    entity.codeValues = weatherCategory?.codeValues ?? [];
-    entity.name = weatherCategory?.name ?? '';
-    entity.unit = weatherCategory?.unit ?? '';
-    return entity;
-  }
-}
-
 // 미세먼지
-extension ToDnsty on DnstyEntity {
-  FineDust toDnsty() {
-    var dnsty = FineDust();
-    dnsty.so2Grade = so2Grade;
-    dnsty.coFlag = coFlag;
-    dnsty.khaiValue = khaiValue;
-    dnsty.so2Value = so2Value;
-    dnsty.coValue = coValue;
-    dnsty.pm10Flag = pm10Flag;
-    dnsty.pm10Value = pm10Value;
-    dnsty.pm10Value24 = pm10Value24;
-    dnsty.pm25Value = pm25Value;
-    dnsty.pm25Value24 = pm25Value24;
-    dnsty.o3Grade = o3Grade;
-    dnsty.khaiGrade = khaiGrade;
-    dnsty.no2Flag = no2Flag;
-    dnsty.no2Grade = no2Grade;
-    dnsty.o3Flag = o3Flag;
-    dnsty.so2Flag = so2Flag;
-    dnsty.dataTime = dataTime;
-    dnsty.coGrade = coGrade;
-    dnsty.no2Value = no2Value;
-    dnsty.pm10Grade = pm10Grade;
-    dnsty.o3Value = o3Value;
-    return dnsty;
+extension ToFineDust on FineDustEntity {
+  FineDust toFineDust() {
+    return FineDust(
+      so2Grade: so2Grade,
+      coFlag: coFlag,
+      khaiValue: khaiValue,
+      so2Value: so2Value,
+      coValue: coValue,
+      pm10Flag: pm10Flag,
+      pm10Value: pm10Value,
+      pm10Value24: pm10Value24,
+      pm25Value: pm25Value,
+      pm25Value24: pm25Value24,
+      o3Grade: o3Grade,
+      khaiGrade: khaiGrade,
+      no2Flag: no2Flag,
+      no2Grade: no2Grade,
+      o3Flag: o3Flag,
+      so2Flag: so2Flag,
+      dataTime: dataTime,
+      coGrade: coGrade,
+      no2Value: no2Value,
+      pm10Grade: pm10Grade,
+      o3Value: o3Value,
+    );
   }
 }
 
-extension ToDnstyEntity on FineDust {
-  DnstyEntity toDnstyEntity() {
-    var dnstyEntity = DnstyEntity();
-    dnstyEntity.so2Grade = so2Grade;
-    dnstyEntity.coFlag = coFlag;
-    dnstyEntity.khaiValue = khaiValue;
-    dnstyEntity.so2Value = so2Value;
-    dnstyEntity.coValue = coValue;
-    dnstyEntity.pm10Flag = pm10Flag;
-    dnstyEntity.pm10Value = pm10Value;
-    dnstyEntity.pm10Value24 = pm10Value24;
-    dnstyEntity.pm25Value = pm25Value;
-    dnstyEntity.pm25Value24 = pm25Value24;
-    dnstyEntity.o3Grade = o3Grade;
-    dnstyEntity.khaiGrade = khaiGrade;
-    dnstyEntity.no2Flag = no2Flag;
-    dnstyEntity.no2Grade = no2Grade;
-    dnstyEntity.o3Flag = o3Flag;
-    dnstyEntity.so2Flag = so2Flag;
-    dnstyEntity.dataTime = dataTime;
-    dnstyEntity.coGrade = coGrade;
-    dnstyEntity.no2Value = no2Value;
-    dnstyEntity.pm10Grade = pm10Grade;
-    dnstyEntity.o3Value = o3Value;
-    return dnstyEntity;
+extension ToFineDustEntity on FineDust {
+  FineDustEntity toFineDustEntity() {
+    var entity = FineDustEntity();
+    entity.so2Grade = so2Grade;
+    entity.coFlag = coFlag;
+    entity.khaiValue = khaiValue;
+    entity.so2Value = so2Value;
+    entity.coValue = coValue;
+    entity.pm10Flag = pm10Flag;
+    entity.pm10Value = pm10Value;
+    entity.pm10Value24 = pm10Value24;
+    entity.pm25Value = pm25Value;
+    entity.pm25Value24 = pm25Value24;
+    entity.o3Grade = o3Grade;
+    entity.khaiGrade = khaiGrade;
+    entity.no2Flag = no2Flag;
+    entity.no2Grade = no2Grade;
+    entity.o3Flag = o3Flag;
+    entity.so2Flag = so2Flag;
+    entity.dataTime = dataTime;
+    entity.coGrade = coGrade;
+    entity.no2Value = no2Value;
+    entity.pm10Grade = pm10Grade;
+    entity.o3Value = o3Value;
+    return entity;
   }
 }
 
@@ -187,9 +148,9 @@ extension ToAddress on AddressEntity {
 }
 
 // 출몰
-extension ToRiseSetEntity on SunRiseSet {
-  RiseSetEntity toRiseSetEntity() {
-    var entity = RiseSetEntity();
+extension ToSunRiseEntity on SunRise {
+  SunRiseEntity toSunRiseEntity() {
+    var entity = SunRiseEntity();
     entity.locdate = locdate;
     entity.location = location;
     entity.sunrise = sunrise;
@@ -202,9 +163,9 @@ extension ToRiseSetEntity on SunRiseSet {
   }
 }
 
-extension ToRiseSet on RiseSetEntity {
-  SunRiseSet toRiseSet() {
-    var address = SunRiseSet(
+extension ToSunRise on SunRiseEntity {
+  SunRise toSunRise() {
+    return SunRise(
       locdate: locdate,
       location: location,
       sunrise: sunrise,
@@ -214,7 +175,6 @@ extension ToRiseSet on RiseSetEntity {
       longitudeNum: longitudeNum,
       latitudeNum: latitudeNum,
     );
-    return address;
   }
 }
 
@@ -285,9 +245,9 @@ extension ToObservatoryFromEntity on ObservatoryEntity {
 }
 
 // 자외선
-extension ToUVRaysEntity on UVRays {
-  UVRaysEntity toUVRaysEntity() {
-    var entity = UVRaysEntity();
+extension ToUltravioletEntity on Ultraviolet {
+  UltravioletEntity toUltravioletEntity() {
+    var entity = UltravioletEntity();
     entity.code = code;
     entity.areaNo = areaNo;
     entity.date = date;
@@ -304,9 +264,9 @@ extension ToUVRaysEntity on UVRays {
   }
 }
 
-extension ToUVRays on UVRaysEntity {
-  UVRays toUVRays() {
-    var uvRays = UVRays(
+extension ToUltraviolet on UltravioletEntity {
+  Ultraviolet toUltraviolet() {
+    var uvRays = Ultraviolet(
       code: code,
       areaNo: areaNo,
       date: date,
@@ -352,9 +312,9 @@ extension ToMidCodeFromEntity on MidCodeEntity {
   }
 }
 
-extension ToMidTaEntity on MidTermTemperature {
-  MidTaEntity toMidTaEntity() {
-    var entity = MidTaEntity();
+extension ToMidTermTemperatureEntity on MidTermTemperature {
+  MidTermTemperatureEntity toMidTermTemperatureEntity() {
+    var entity = MidTermTemperatureEntity();
     entity.regId = regId;
     entity.taMin3 = taMin3;
     entity.taMax3 = taMax3;
@@ -379,8 +339,8 @@ extension ToMidTaEntity on MidTermTemperature {
   }
 }
 
-extension ToMidTa on MidTaEntity {
-  MidTermTemperature toMidTa() {
+extension ToMidTermTemperature on MidTermTemperatureEntity {
+  MidTermTemperature toMidTermTemperature() {
     MidTermTemperature midTa = MidTermTemperature(
       regId: regId,
       taMin3: taMin3,
@@ -405,9 +365,9 @@ extension ToMidTa on MidTaEntity {
   }
 }
 
-extension ToMidLandFcstEntity on MidTermLand {
-  MidLandFcstEntity toMidLandFcstEntity() {
-    var entity = MidLandFcstEntity();
+extension ToMidTermLandEntity on MidTermLand {
+  MidTermLandEntity toMidTermLandEntity() {
+    var entity = MidTermLandEntity();
     entity.regId = regId;
     entity.rnSt3Am = rnSt3Am;
     entity.rnSt3Pm = rnSt3Pm;
@@ -440,9 +400,9 @@ extension ToMidLandFcstEntity on MidTermLand {
   }
 }
 
-extension ToMidLandFcst on MidLandFcstEntity {
-  MidTermLand toMidLandFcst() {
-    MidTermLand midLandFcst = MidTermLand(
+extension ToMidTermLand on MidTermLandEntity {
+  MidTermLand toMidTermLand() {
+    MidTermLand midTermLand = MidTermLand(
       regId: regId,
       rnSt3Am: rnSt3Am,
       rnSt3Pm: rnSt3Pm,
@@ -471,7 +431,7 @@ extension ToMidLandFcst on MidLandFcstEntity {
       wf9: wf9,
       wf10: wf10,
     );
-    midLandFcst.date = date;
-    return midLandFcst;
+    midTermLand.date = date;
+    return midTermLand;
   }
 }

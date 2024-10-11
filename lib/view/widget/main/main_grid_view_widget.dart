@@ -48,8 +48,8 @@ class MainGridViewWidget extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  state.dnstyList.isNotEmpty
-                      ? '${state.dnstyList[0].pm10Value24 ?? ''}μg/m3'
+                  state.fineDustList.isNotEmpty
+                      ? '${state.fineDustList[0].pm10Value24 ?? ''}μg/m3'
                       : '',
                   style: caption(context, 0.5),
                 ),
@@ -71,8 +71,8 @@ class MainGridViewWidget extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  state.dnstyList.isNotEmpty
-                      ? '${state.dnstyList[0].pm25Value24 ?? ''}μg/m3'
+                  state.fineDustList.isNotEmpty
+                      ? '${state.fineDustList[0].pm25Value24 ?? ''}μg/m3'
                       : '',
                   style: caption(context, 0.5),
                 ),
@@ -86,8 +86,8 @@ class MainGridViewWidget extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                pngIcon('sad_sunny.png',
-                    Theme.of(context).colorScheme.onBackground,
+                pngIcon(
+                    'sad_sunny.png', Theme.of(context).colorScheme.onSurface,
                     width: 32, height: 32),
                 const SizedBox(
                   height: 10,
@@ -100,7 +100,7 @@ class MainGridViewWidget extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  state.uvRays != null ? state.uvRays?.h0 ?? '' : '',
+                  state.ultraviolet != null ? state.ultraviolet?.h0 ?? '' : '',
                   style: caption(context, 0.5),
                 ),
               ],
@@ -113,7 +113,10 @@ class MainGridViewWidget extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.water_drop, size: 32.0,),
+                const Icon(
+                  Icons.water_drop,
+                  size: 32.0,
+                ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -140,8 +143,7 @@ class MainGridViewWidget extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                pngIcon('windy.png',
-                    Theme.of(context).colorScheme.onBackground,
+                pngIcon('windy.png', Theme.of(context).colorScheme.onSurface,
                     width: 32, height: 32),
                 const SizedBox(
                   height: 10,
@@ -173,15 +175,14 @@ class MainGridViewWidget extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                pngIcon('sunrise.png',
-                    Theme.of(context).colorScheme.onBackground,
+                pngIcon('sunrise.png', Theme.of(context).colorScheme.onSurface,
                     width: 32, height: 32),
                 const SizedBox(
                   height: 10,
                 ),
                 Text(
-                  state.riseSet != null ?
-                  '${int.parse(state.riseSet?.sunrise?.substring(0, 2) ?? '0')}:${state.riseSet?.sunrise?.substring(2, 4)}'
+                  state.riseSet != null
+                      ? '${int.parse(state.riseSet?.sunrise?.substring(0, 2) ?? '0')}:${state.riseSet?.sunrise?.substring(2, 4)}'
                       : '',
                   style: caption(context, 0.5),
                 ),
@@ -190,15 +191,14 @@ class MainGridViewWidget extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                pngIcon('sunset.png',
-                    Theme.of(context).colorScheme.onBackground,
+                pngIcon('sunset.png', Theme.of(context).colorScheme.onSurface,
                     width: 32, height: 32),
                 const SizedBox(
                   height: 10,
                 ),
                 Text(
-                  state.riseSet != null ?
-                  '${int.parse(state.riseSet?.sunset?.substring(0, 2) ?? '0')}:${state.riseSet?.sunset?.substring(2, 4)}'
+                  state.riseSet != null
+                      ? '${int.parse(state.riseSet?.sunset?.substring(0, 2) ?? '0')}:${state.riseSet?.sunset?.substring(2, 4)}'
                       : '',
                   style: caption(context, 0.5),
                 ),

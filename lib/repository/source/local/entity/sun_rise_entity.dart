@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'rise_set_entity.g.dart';
+part 'sun_rise_entity.g.dart';
 
 @HiveType(typeId: 4)
-class RiseSetEntity extends HiveObject {
+class SunRiseEntity extends HiveObject {
   @HiveField(0)
   String? locdate;
   @HiveField(1)

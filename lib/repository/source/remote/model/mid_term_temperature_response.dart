@@ -1,20 +1,19 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sweater/repository/source/remote/model/weather_category.dart';
 
-part 'weather_response.g.dart';
+part 'mid_term_temperature_response.g.dart';
 
 @JsonSerializable()
-class WeatherResponse {
+class MidTermTemperatureResponse {
   final ResponseData response;
 
-  WeatherResponse({
+  MidTermTemperatureResponse({
     required this.response,
   });
 
-  factory WeatherResponse.fromJson(Map<String, dynamic> json) =>
-      _$WeatherResponseFromJson(json);
+  factory MidTermTemperatureResponse.fromJson(Map<String, dynamic> json) =>
+      _$MidTermTemperatureResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherResponseToJson(this);
+  Map<String, dynamic> toJson() => _$MidTermTemperatureResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -73,7 +72,7 @@ class ResponseBody {
 
 @JsonSerializable()
 class Items {
-  final List<WeatherItem>? item;
+  final List<MidTermTemperature>? item;
 
   Items({
     this.item,
@@ -85,32 +84,48 @@ class Items {
 }
 
 @JsonSerializable()
-class WeatherItem {
-  String? baseDate;
-  String? baseTime;
-  String? category;
-  int? nx;
-  int? ny;
-  String? obsrValue;
-  String? fcstDate;
-  String? fcstTime;
-  String? fcstValue;
-  WeatherCategory? weatherCategory;
+class MidTermTemperature {
+  String? regId;
+  int? taMin3;
+  int? taMax3;
+  int? taMin4;
+  int? taMax4;
+  int? taMin5;
+  int? taMax5;
+  int? taMin6;
+  int? taMax6;
+  int? taMin7;
+  int? taMax7;
+  int? taMin8;
+  int? taMax8;
+  int? taMin9;
+  int? taMax9;
+  int? taMin10;
+  int? taMax10;
+  String? date;
 
-  WeatherItem({
-    this.baseDate,
-    this.baseTime,
-    this.category,
-    this.nx,
-    this.ny,
-    this.obsrValue,
-    this.fcstDate,
-    this.fcstTime,
-    this.fcstValue,
+  MidTermTemperature({
+    this.regId,
+    this.taMin3,
+    this.taMax3,
+    this.taMin4,
+    this.taMax4,
+    this.taMin5,
+    this.taMax5,
+    this.taMin6,
+    this.taMax6,
+    this.taMin7,
+    this.taMax7,
+    this.taMin8,
+    this.taMax8,
+    this.taMin9,
+    this.taMax9,
+    this.taMin10,
+    this.taMax10,
   });
 
-  factory WeatherItem.fromJson(Map<String, dynamic> json) =>
-      _$WeatherItemFromJson(json);
+  factory MidTermTemperature.fromJson(Map<String, dynamic> json) =>
+      _$MidTermTemperatureFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherItemToJson(this);
+  Map<String, dynamic> toJson() => _$MidTermTemperatureToJson(this);
 }

@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'dnsty_entity.g.dart';
+part 'fine_dust_entity.g.dart';
 
 @HiveType(typeId: 2)
-class DnstyEntity extends HiveObject {
+class FineDustEntity extends HiveObject {
   @HiveField(0)
   String? so2Grade; // 아황산가스
   @HiveField(1)

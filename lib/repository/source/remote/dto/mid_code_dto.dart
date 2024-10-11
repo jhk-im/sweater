@@ -10,6 +10,6 @@ class MidCodeDto with _$MidCodeDto {
     required String code,
   }) = _MidCodeDto;
 
-  factory MidCodeDto.fromJson(Map<String, Object?> json)
-  => _$MidCodeDtoFromJson(json);
+  factory MidCodeDto.fromJson(Map<String, Object?> json) =>
+      _$MidCodeDtoFromJson(json);
 }

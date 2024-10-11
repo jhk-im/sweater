@@ -1,20 +1,19 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sweater/repository/source/remote/model/weather_category.dart';
 
-part 'weather_response.g.dart';
+part 'ultraviolet_response.g.dart';
 
 @JsonSerializable()
-class WeatherResponse {
+class UltravioletResponse {
   final ResponseData response;
 
-  WeatherResponse({
+  UltravioletResponse({
     required this.response,
   });
 
-  factory WeatherResponse.fromJson(Map<String, dynamic> json) =>
-      _$WeatherResponseFromJson(json);
+  factory UltravioletResponse.fromJson(Map<String, dynamic> json) =>
+      _$UltravioletResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherResponseToJson(this);
+  Map<String, dynamic> toJson() => _$UltravioletResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -73,7 +72,7 @@ class ResponseBody {
 
 @JsonSerializable()
 class Items {
-  final List<WeatherItem>? item;
+  final List<Ultraviolet>? item;
 
   Items({
     this.item,
@@ -85,32 +84,37 @@ class Items {
 }
 
 @JsonSerializable()
-class WeatherItem {
-  String? baseDate;
-  String? baseTime;
-  String? category;
-  int? nx;
-  int? ny;
-  String? obsrValue;
-  String? fcstDate;
-  String? fcstTime;
-  String? fcstValue;
-  WeatherCategory? weatherCategory;
+class Ultraviolet {
+  String? code;
+  String? areaNo;
+  String? date;
+  String? h0;
+  String? h3;
+  String? h6;
+  String? h9;
+  String? h12;
+  String? h15;
+  String? h18;
+  String? h21;
+  String? h24;
 
-  WeatherItem({
-    this.baseDate,
-    this.baseTime,
-    this.category,
-    this.nx,
-    this.ny,
-    this.obsrValue,
-    this.fcstDate,
-    this.fcstTime,
-    this.fcstValue,
+  Ultraviolet({
+    this.code,
+    this.areaNo,
+    this.date,
+    this.h0,
+    this.h3,
+    this.h6,
+    this.h9,
+    this.h12,
+    this.h15,
+    this.h18,
+    this.h21,
+    this.h24,
   });
 
-  factory WeatherItem.fromJson(Map<String, dynamic> json) =>
-      _$WeatherItemFromJson(json);
+  factory Ultraviolet.fromJson(Map<String, dynamic> json) =>
+      _$UltravioletFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherItemToJson(this);
+  Map<String, dynamic> toJson() => _$UltravioletToJson(this);
 }
