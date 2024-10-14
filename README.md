@@ -1,4 +1,4 @@
-# Sweater - MVVM(Provider + Hive + Repository)
+# Sweater - Provider + Hive + Retrofit
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Github](https://img.shields.io/badge/github-jhk-orange?logo=github&logoColor=white)](https://github.com/jhk-im)
@@ -21,12 +21,10 @@
 ## Tech Stack
 
 - Flutter
-- MVVM Architecture (Provider + Hive + Repository)
-- [Provider](https://pub.dev/packages/provider)
-- [Hive](https://pub.dev/packages/hive)
-- [hive_generator](https://pub.dev/packages/hive)
+- [provider](https://pub.dev/packages/provider)
+- [hive](https://pub.dev/packages/hive)
+- [retrofit](https://pub.dev/packages/retrofit)
 - [freezed](https://pub.dev/packages/freezed)
-- [freezed_annotation](https://pub.dev/packages/freezed_annotation)
 - [build_runner](https://pub.dev/packages/build_runner)
 - [geolocator](https://pub.dev/packages/geolocator)
 </br>
