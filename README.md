@@ -15,12 +15,9 @@
   <img src="./readme/light3.png" width="250" height="500"/>
 </p>
 
-</br>
-<img src = "./readme/dark.gif" align="right" width="25%"/>
-
 ## Tech Stack
 
-- Flutter
+- flutter
 - [provider](https://pub.dev/packages/provider)
 - [hive](https://pub.dev/packages/hive)
 - [retrofit](https://pub.dev/packages/retrofit)
