@@ -38,9 +38,8 @@ class _MainTopWidgetState extends State<MainTopWidget> {
             ),
             if (!widget.isScrollDown)
               Text(
-                widget.state.ultraShortTerm.isNotEmpty
-                    ? _getTemperatureFromUltraShortTerm(
-                        widget.state.ultraShortTerm)
+                widget.state.todayTmpList.isNotEmpty
+                    ? '${widget.state.todayTmpList[0].fcstValue ?? ''}°'
                     : '',
                 style: largeTitleBold(context),
               ),
@@ -74,17 +73,6 @@ class _MainTopWidgetState extends State<MainTopWidget> {
     if (list.isNotEmpty) {
       WeatherItem item = list[0];
       return '${item.fcstValue?.substring(0, item.fcstValue!.length - 2) ?? ''}°';
-    }
-    return '';
-  }
-
-  String _getTemperatureFromUltraShortTerm(List<WeatherItem> list) {
-    if (list.isNotEmpty) {
-      for (WeatherItem item in list) {
-        if (item.category == 'T1H') {
-          return '${item.obsrValue?.substring(0, item.obsrValue!.length - 2) ?? ''}°';
-        }
-      }
     }
     return '';
   }

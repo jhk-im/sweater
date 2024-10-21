@@ -47,32 +47,39 @@ class _WeatherMainScreenState extends State<WeatherMainScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Flex(
-              mainAxisAlignment: MainAxisAlignment.center,
-              direction: Axis.vertical,
-              children: [
-                MainTopWidget(
-                  state: state,
-                  isScrollDown: isScrollDown,
-                ),
-                Expanded(
-                  flex: 1,
-                  child: ListView(
-                    controller: _controller,
-                    children: [
-                      MainTodayListViewWidget(state: state),
-                      MainWeeksListViewWidget(state: state),
-                      MainGridViewWidget(state: state),
-                    ],
+      body: RefreshIndicator(
+        color: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        onRefresh: () async {
+          if (!state.isLoading) viewModel.getWeatherInfo(isRefresh: true);
+        },
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Flex(
+                mainAxisAlignment: MainAxisAlignment.center,
+                direction: Axis.vertical,
+                children: [
+                  MainTopWidget(
+                    state: state,
+                    isScrollDown: isScrollDown,
                   ),
-                )
-              ],
-            ),
-            if (state.isLoading) const LoadingWidget(),
-          ],
+                  Expanded(
+                    flex: 1,
+                    child: ListView(
+                      controller: _controller,
+                      children: [
+                        MainTodayListViewWidget(state: state),
+                        MainWeeksListViewWidget(state: state),
+                        MainGridViewWidget(state: state),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              if (state.isLoading) const LoadingWidget(),
+            ],
+          ),
         ),
       ),
     );

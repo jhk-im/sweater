@@ -16,6 +16,7 @@ class MainWeeksListViewWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Card(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

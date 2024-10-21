@@ -14,6 +14,7 @@ class MainTodayListViewWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Card(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: SizedBox(
           height: 200.0,
           child: ListView.builder(

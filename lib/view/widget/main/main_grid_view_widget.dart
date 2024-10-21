@@ -36,6 +36,7 @@ class MainGridViewWidget extends StatelessWidget {
     switch (index) {
       case 0:
         return Card(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -59,6 +60,7 @@ class MainGridViewWidget extends StatelessWidget {
         );
       case 1:
         return Card(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -82,6 +84,7 @@ class MainGridViewWidget extends StatelessWidget {
         );
       case 2:
         return Card(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -109,6 +112,7 @@ class MainGridViewWidget extends StatelessWidget {
         );
       case 3:
         return Card(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -139,6 +143,7 @@ class MainGridViewWidget extends StatelessWidget {
         );
       case 4:
         return Card(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -168,6 +173,7 @@ class MainGridViewWidget extends StatelessWidget {
     }
     // 일출 일몰
     return Card(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

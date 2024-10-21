@@ -10,9 +10,9 @@ class LoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).colorScheme.surface,
-      child: const Center(
+      child: Center(
         child: SpinKitPulse(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.primary,
           size: 50,
         ),
       ),
